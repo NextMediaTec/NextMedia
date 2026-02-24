@@ -14,9 +14,11 @@ import { AuthService } from "../services/auth.service";
 export class RegisterComponent {
 
     email = '';
+    username = '';
     password = '';
     confirmPassword = '';
     errorMessage = '';
+    loading = false;
 
     constructor(
         private authService: AuthService,
@@ -27,7 +29,7 @@ export class RegisterComponent {
         event.preventDefault();
         this.errorMessage = '';
 
-        if (!this.email || !this.password || !this.confirmPassword) {
+        if (!this.email || !this.username || !this.password || !this.confirmPassword) {
             this.errorMessage = 'All fields are required';
             return;
         }
@@ -38,10 +40,18 @@ export class RegisterComponent {
         }
 
         try {
-            await this.authService.register(this.email, this.password);
+            this.loading = true;
+
+            await this.authService.register(
+                this.email,
+                this.password,
+                this.username
+            );
             this.router.navigate(['/home']);
         } catch (error: any) {
             this.errorMessage = error.message;
+        }finally {
+            this.loading = false;
         }
     }
     goToLogin() {

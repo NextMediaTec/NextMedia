@@ -10,6 +10,13 @@
             required/>
 
 
+        <label>Username</label>
+        <input type="text"
+            [(ngModel)]="username"
+            name="username"
+            required/>
+        
+
         <label>Password</label>
         <input type="password"
             [(ngModel)]="password"
@@ -27,13 +34,14 @@
                 {{errorMessage}}
             </p>
 
-            <button type="submit">Register</button>
+            <button type="submit" [disabled]="loading">
+                {{loading ? 'Creating account...' : 'Register'}}</button>
 
     </form>
 
     <p>
         Already have an account?
-        <button (click)="goToLogin()">Login</button>
+        <button type="button" (click)="goToLogin()">Login</button>
     </p>
 
 </div>

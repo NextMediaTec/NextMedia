@@ -11,13 +11,14 @@ export class AuthService {
 
     constructor(private firebase: FirebaseService){}
 
-    async register(email: string, password: string){
+    async register(email: string, password: string, username: string){
         const cred = await createUserWithEmailAndPassword(this.firebase.auth, email, password);
 
         await set(ref(this.firebase.db, 'users/' + cred.user.uid), {
-            email,
-            createdAt: Date.now(),
-            isPrivate: false
+            email: cred.user.email,
+            username: username,
+            role: 'user',
+            createdAt: new Date().toISOString(),
         });
 
         return cred.user;
