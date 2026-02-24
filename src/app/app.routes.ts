@@ -3,6 +3,7 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { HomeComponent } from './home/home.component';
 import { AuthGuard } from './guards/auth.guard';
+import { DashboardComponent } from './dashboard/dashboard';
 
 
 export const routes: Route[] = [
@@ -10,5 +11,6 @@ export const routes: Route[] = [
     {path: '', redirectTo: '/login', pathMatch: 'full'},
     {path: 'register', component: RegisterComponent},
     {path: 'login', component: LoginComponent},
-    {path: 'home', component: HomeComponent, canActivate: [AuthGuard]}
+    {path: 'home', component: HomeComponent, canActivate: [AuthGuard]},
+    {path: 'dashboard', component: DashboardComponent},
 ];
