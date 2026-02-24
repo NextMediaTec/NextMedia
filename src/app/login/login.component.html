@@ -1,0 +1,32 @@
+<div class="login-container">
+<h2>Login</h2>
+
+<form (submit)="login($event)">
+
+    <label>Email</label>
+    <input type="email"
+    [(ngModel)]="email"
+    name="email"
+    required/>
+
+    <label>Password</label>
+    <input type="password"
+    [(ngModel)]="password"
+    name="password"
+    required/>
+
+
+    <p *ngIf="errorMessage" style="color: red;">
+        {{errorMessage}}
+    </p>
+
+    <button type="submit">Login</button>
+    
+</form>
+
+<p>
+    Dont have an account?
+    <button (click)="goToRegister()">Register</button>
+</p>
+
+</div>
