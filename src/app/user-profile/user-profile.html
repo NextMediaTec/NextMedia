@@ -1,0 +1,59 @@
+<div class="dashboard-container">
+  <div class="Navbar">
+    <ul>
+      <li><a href="javascript:void(0)" (click)="optionChangePassword()">Change Password</a></li>
+      <li><a href="javascript:void(0)" (click)="optionChangeUsername()">Change Username</a></li>
+      <li><a href="javascript:void(0)" (click)="optionChangeProfilePic()">Change Profile Picture</a></li>
+    </ul>
+  </div>
+
+  <div class="content">
+    <!-- Password -->
+    <div *ngIf="isChangePassword">
+      <h2>Change Password</h2>
+      <div class="input-group">
+        <input type="password" [value]="newPassword" (input)="updatePassword($event)" placeholder="New Password"/>
+      </div>
+      <div class="input-group">
+        <input type="password" [value]="confirmPassword" (input)="updateConfirmPassword($event)" placeholder="Confirm Password"/>
+      </div>
+      <button (click)="submitNewPassword()">Submit</button>
+    </div>
+
+    <!-- Username -->
+    <div *ngIf="isChangeUsername">
+      <h2>Change Username</h2>
+      <p>Current Username: {{ currentUsername || 'Not set' }}</p><br/>
+      <div class="input-group">
+        <input type="text" [value]="newUsername" (input)="updateUsername($event)" placeholder="New Username"/>
+      </div>
+      <button (click)="submitNewUsername()">Submit</button>
+    </div>
+
+    <!-- Profile picture (grid selection) -->
+    <div *ngIf="isChangeProfilePic">
+      <h2>Change Profile Picture</h2>
+
+      <div class="profile-picture-picker">
+        <img [src]="getAvatarSrcById(currentAvatarId)" alt="Profile Picture" class="avatar-preview"/>
+
+        <div class="avatar-grid">
+          <button
+            type="button"
+            class="avatar-tile"
+            *ngFor="let a of avatarOptions"
+            (click)="selectAvatar(a.id)"
+            [class.selected]="a.id === currentAvatarId"
+            [attr.aria-pressed]="a.id === currentAvatarId"
+          >
+            <img [src]="a.src" [alt]="a.id" class="avatar-tile-img"/>
+          </button>
+        </div>
+
+        <p class="avatar-hint">
+          Click an avatar to set it as your profile picture.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

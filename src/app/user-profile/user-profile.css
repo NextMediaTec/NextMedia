@@ -1,0 +1,217 @@
+/* ---------------- Settings Layout ---------------- */
+.dashboard-container {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 2rem;
+  padding: 2rem;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* ---------------- Sidebar ---------------- */
+.Navbar {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 20px;
+  color: var(--app-fg);
+}
+
+.navbar a{
+  color: inherit;
+}
+
+.Navbar ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.Navbar ul li {
+  margin-bottom: 10px;
+}
+
+.Navbar ul li a {
+  display: block;
+  font-size: 1.05rem;
+  padding: 10px;
+  border-radius: 8px;
+  color: inherit;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  text-decoration: none;
+}
+
+.Navbar ul li a:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ---------------- Content ---------------- */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  color: var(--app-fg);
+}
+
+.content h2 {
+  font-size: 1.25rem;
+  margin: 0 0 1rem 0;
+}
+
+/* Bokse i content */
+.content > div {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.5rem;
+}
+
+/* ---------------- Input Groups ---------------- */
+.input-group {
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.input-group input,
+.input-group select {
+  width: 250px;
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--app-fg);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  border-color: #6a7dff;
+  outline: none;
+}
+
+.input-group input::placeholder {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* ---------------- Buttons ---------------- */
+button {
+  width: 250px;
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #040029;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.06s ease;
+  margin-top: 8px;
+}
+
+button:hover {
+  background-color: #0b0766;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:focus {
+  outline: 2px solid #6a7dff;
+  outline-offset: 2px;
+}
+
+/* ---------------- Profile Picture Grid Picker ---------------- */
+.profile-picture-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.avatar-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+}
+
+.avatar-grid {
+  width: 100%;
+  max-width: 520px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.avatar-tile {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  margin-top: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  transition: transform 0.06s ease, border-color 0.15s ease, background-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-tile:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.avatar-tile:active {
+  transform: translateY(1px);
+}
+
+.avatar-tile.selected {
+  border-color: #6a7dff;
+  box-shadow: 0 0 0 3px rgba(106, 125, 255, 0.22);
+}
+
+.avatar-tile-img {
+  width: 85%;
+  height: 85%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.avatar-hint {
+  margin: 0;
+  opacity: 0.8;
+  font-size: 0.95rem;
+}
+
+/* ---------------- Mobile Responsiveness ---------------- */
+@media (max-width: 768px) {
+  .dashboard-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    margin-top: 6vh;
+  }
+
+  .Navbar {
+    width: 100%;
+  }
+
+  .input-group input,
+  button {
+    width: 100%;
+  }
+
+  .avatar-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
