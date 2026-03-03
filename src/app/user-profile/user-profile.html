@@ -1,37 +1,62 @@
 <div class="dashboard-container">
   <div class="Navbar">
+    <div class="profile-header-box outline-box">
+      <div class="profile-header-row">
+        <img [src]="getAvatarSrcById(currentAvatarId)" alt="Profile Picture" class="avatar-preview small"/>
+        <div class="profile-header-meta">
+          <div class="profile-name">{{ currentUsername }}</div>
+          <div class="profile-sub">Role: {{ currentRole }}</div>
+          <div class="profile-sub">Created: {{ currentCreatedAt }}</div>
+        </div>
+      </div>
+
+      <div class="profile-view-mode" *ngIf="!isOwner">
+        Viewing profile (read-only)
+      </div>
+
+      <button class="btn-secondary"
+              *ngIf="canSendFriendRequestToViewedProfile()"
+              (click)="sendFriendRequestToViewedProfile()">
+        Send Friend Request
+      </button>
+    </div>
+
     <ul>
-      <li><a href="javascript:void(0)" (click)="optionChangePassword()">Change Password</a></li>
-      <li><a href="javascript:void(0)" (click)="optionChangeUsername()">Change Username</a></li>
-      <li><a href="javascript:void(0)" (click)="optionChangeProfilePic()">Change Profile Picture</a></li>
+      <li *ngIf="isOwner"><a href="javascript:void(0)" (click)="optionChangePassword()">Change Password</a></li>
+      <li *ngIf="isOwner"><a href="javascript:void(0)" (click)="optionChangeUsername()">Change Username</a></li>
+      <li *ngIf="isOwner"><a href="javascript:void(0)" (click)="optionChangeProfilePic()">Change Profile Picture</a></li>
+
+      <li class="divider"></li>
+
+      <li><a href="javascript:void(0)" (click)="optionShowWatchlist()">Watchlist (Movies)</a></li>
+      <li><a href="javascript:void(0)" (click)="optionShowFavorites()">Favorites</a></li>
+      <li><a href="javascript:void(0)" (click)="optionShowFriends()">Friends</a></li>
+      <li><a href="javascript:void(0)" (click)="optionShowMyReviews()">Reviews</a></li>
     </ul>
   </div>
 
   <div class="content">
-    <!-- Password -->
-    <div *ngIf="isChangePassword">
+    <div *ngIf="isChangePassword" class="panel outline-box">
       <h2>Change Password</h2>
       <div class="input-group">
-        <input type="password" [value]="newPassword" (input)="updatePassword($event)" placeholder="New Password"/>
+        <input class="outlined-input" type="password" [value]="newPassword" (input)="updatePassword($event)" placeholder="New Password"/>
       </div>
       <div class="input-group">
-        <input type="password" [value]="confirmPassword" (input)="updateConfirmPassword($event)" placeholder="Confirm Password"/>
+        <input class="outlined-input" type="password" [value]="confirmPassword" (input)="updateConfirmPassword($event)" placeholder="Confirm Password"/>
       </div>
       <button (click)="submitNewPassword()">Submit</button>
     </div>
 
-    <!-- Username -->
-    <div *ngIf="isChangeUsername">
+    <div *ngIf="isChangeUsername" class="panel outline-box">
       <h2>Change Username</h2>
       <p>Current Username: {{ currentUsername || 'Not set' }}</p><br/>
       <div class="input-group">
-        <input type="text" [value]="newUsername" (input)="updateUsername($event)" placeholder="New Username"/>
+        <input class="outlined-input" type="text" [value]="newUsername" (input)="updateUsername($event)" placeholder="New Username"/>
       </div>
       <button (click)="submitNewUsername()">Submit</button>
     </div>
 
-    <!-- Profile picture (grid selection) -->
-    <div *ngIf="isChangeProfilePic">
+    <div *ngIf="isChangeProfilePic" class="panel outline-box">
       <h2>Change Profile Picture</h2>
 
       <div class="profile-picture-picker">
@@ -55,5 +80,301 @@
         </p>
       </div>
     </div>
+
+    <div *ngIf="isShowWatchlist" class="panel outline-box">
+      <h2>Watchlist (Movies)</h2>
+
+      <div class="list-container outline-box">
+        <div class="list-row list-header">
+          <div class="col col-main">Movie</div>
+          <div class="col col-meta">Added</div>
+        </div>
+
+        <div class="list-row" *ngFor="let m of watchlistMovies">
+          <div class="col col-main">
+            <div class="title">{{ m?.title || m?.movieId || 'Unknown' }}</div>
+            <div class="sub">{{ m?.movieId ? ('ID: ' + m.movieId) : '' }}</div>
+          </div>
+          <div class="col col-meta">{{ m?.createdAt || '—' }}</div>
+        </div>
+
+        <div class="empty" *ngIf="watchlistMovies.length === 0">
+          No watchlist movies yet.
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="isShowFavorites" class="panel outline-box">
+      <h2>Favorites</h2>
+
+      <div class="two-col">
+        <div class="sub-panel outline-box">
+          <h3>Favorite Movies</h3>
+
+          <div class="list-container outline-box">
+            <div class="list-row list-header">
+              <div class="col col-main">Movie</div>
+              <div class="col col-meta">Added</div>
+            </div>
+
+            <div class="list-row" *ngFor="let m of favoriteMovies">
+              <div class="col col-main">
+                <div class="title">{{ m?.title || m?.movieId || 'Unknown' }}</div>
+                <div class="sub">{{ m?.movieId ? ('ID: ' + m.movieId) : '' }}</div>
+              </div>
+              <div class="col col-meta">{{ m?.createdAt || '—' }}</div>
+            </div>
+
+            <div class="empty" *ngIf="favoriteMovies.length === 0">
+              No favorite movies yet.
+            </div>
+          </div>
+        </div>
+
+        <div class="sub-panel outline-box">
+          <h3>Favorite Series</h3>
+
+          <div class="list-container outline-box">
+            <div class="list-row list-header">
+              <div class="col col-main">Series</div>
+              <div class="col col-meta">Added</div>
+            </div>
+
+            <div class="list-row" *ngFor="let s of favoriteSeries">
+              <div class="col col-main">
+                <div class="title">{{ s?.title || s?.seriesId || 'Unknown' }}</div>
+                <div class="sub">{{ s?.seriesId ? ('ID: ' + s.seriesId) : '' }}</div>
+              </div>
+              <div class="col col-meta">{{ s?.createdAt || '—' }}</div>
+            </div>
+
+            <div class="empty" *ngIf="favoriteSeries.length === 0">
+              No favorite series yet.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ FRIENDS SECTION (VISUALLY SPLIT INTO DISTINCT BOXES) -->
+    <div *ngIf="isShowFriends" class="panel outline-box">
+      <div class="panel-title-row">
+        <h2 class="panel-title">Friends</h2>
+        <span class="panel-chip">Manage friends & requests</span>
+      </div>
+
+      <div class="friends-top outline-box">
+        <div class="input-group full">
+          <input class="outlined-input"
+                 type="text"
+                 [value]="friendSearchText"
+                 (input)="updateFriendSearch($event)"
+                 placeholder="Search friend by username or email"/>
+        </div>
+
+        <div class="friend-request-box outline-box" *ngIf="isOwner">
+          <div class="friend-request-title">Send friend request</div>
+          <div class="input-group full">
+            <input class="outlined-input"
+                   type="text"
+                   [value]="friendRequestUsername"
+                   (input)="updateFriendRequestUsername($event)"
+                   placeholder="Username to add"/>
+          </div>
+          <button (click)="sendFriendRequest()">Send Request</button>
+        </div>
+      </div>
+
+      <!-- ✅ FRIEND LIST (own distinct box) -->
+      <div class="friends-section friends-section-friends outline-box">
+        <div class="section-head">
+          <div class="section-left">
+            <div class="section-title">Friend list</div>
+            <div class="section-sub">Your current friends (favorite status shown)</div>
+          </div>
+          <span class="section-badge section-badge-friends">FRIENDS</span>
+        </div>
+
+        <div class="list-container">
+          <div class="list-row list-header friends-grid">
+            <div class="col col-main">Friend</div>
+            <div class="col col-meta">Favorite</div>
+            <div class="col col-actions" *ngIf="isOwner">Actions</div>
+          </div>
+
+          <div class="list-row friends-grid friend-item-row"
+               *ngFor="let f of getFilteredFriends()"
+               [class.friend-item-fav]="f?.isFavorite === true">
+            <div class="col col-main">
+              <div class="friend-row">
+                <img [src]="getAvatarSrcById(f?.avatarId || defaultAvatarId)" class="friend-avatar" alt="avatar"/>
+                <div class="friend-meta">
+                  <div class="title">{{ f?.username || f?.uid || 'Unknown' }}</div>
+                  <div class="sub">{{ f?.email || '' }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col col-meta">
+              <span class="badge"
+                    [class.badge-on]="f?.isFavorite === true"
+                    [class.badge-fav]="f?.isFavorite === true"
+                    [class.badge-notfav]="f?.isFavorite !== true">
+                {{ f?.isFavorite === true ? 'Favorite' : 'Normal' }}
+              </span>
+            </div>
+
+            <div class="col col-actions" *ngIf="isOwner">
+              <button class="btn-small" (click)="toggleFavoriteFriend(f.uid, f.isFavorite)">Toggle Favorite</button>
+              <button class="btn-small danger" (click)="removeFriend(f.uid)">Remove</button>
+            </div>
+          </div>
+
+          <div class="empty" *ngIf="friends.length === 0">
+            No friends yet.
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ REQUESTS SPLIT (incoming vs outgoing have distinct colors + labels) -->
+      <div class="two-col friend-requests-grid" *ngIf="isOwner">
+        <!-- Incoming -->
+        <div class="friends-section friends-section-incoming outline-box">
+          <div class="section-head">
+            <div class="section-left">
+              <div class="section-title">Incoming requests</div>
+              <div class="section-sub">People who want to add you</div>
+            </div>
+            <span class="section-badge section-badge-incoming">INCOMING</span>
+          </div>
+
+          <div class="list-container">
+            <div class="list-row list-header request-grid">
+              <div class="col col-main">From</div>
+              <div class="col col-meta">Created</div>
+              <div class="col col-actions">Actions</div>
+            </div>
+
+            <div class="list-row request-grid request-row incoming-row"
+                 *ngFor="let r of incomingFriendRequests">
+              <div class="col col-main">
+                <div class="title">{{ r?.username || r?.fromUid || 'Unknown' }}</div>
+                <div class="sub">{{ r?.email || '' }}</div>
+              </div>
+              <div class="col col-meta">{{ r?.createdAt || '—' }}</div>
+              <div class="col col-actions">
+                <button class="btn-small incoming-action" (click)="acceptFriendRequest(r.fromUid)">Accept</button>
+                <button class="btn-small danger" (click)="declineFriendRequest(r.fromUid)">Decline</button>
+              </div>
+            </div>
+
+            <div class="empty" *ngIf="incomingFriendRequests.length === 0">
+              No incoming requests.
+            </div>
+          </div>
+        </div>
+
+        <!-- Outgoing -->
+        <div class="friends-section friends-section-outgoing outline-box">
+          <div class="section-head">
+            <div class="section-left">
+              <div class="section-title">Outgoing requests</div>
+              <div class="section-sub">Requests you have sent</div>
+            </div>
+            <span class="section-badge section-badge-outgoing">OUTGOING</span>
+          </div>
+
+          <div class="list-container">
+            <div class="list-row list-header request-grid">
+              <div class="col col-main">To</div>
+              <div class="col col-meta">Created</div>
+              <div class="col col-actions">Actions</div>
+            </div>
+
+            <div class="list-row request-grid request-row outgoing-row"
+                 *ngFor="let r of outgoingFriendRequests">
+              <div class="col col-main">
+                <div class="title">{{ r?.username || r?.toUid || 'Unknown' }}</div>
+                <div class="sub">{{ r?.email || '' }}</div>
+              </div>
+              <div class="col col-meta">{{ r?.createdAt || '—' }}</div>
+              <div class="col col-actions">
+                <button class="btn-small danger" (click)="cancelOutgoingFriendRequest(r.toUid)">Cancel</button>
+              </div>
+            </div>
+
+            <div class="empty" *ngIf="outgoingFriendRequests.length === 0">
+              No outgoing requests.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="isShowMyReviews" class="panel outline-box">
+      <h2>Reviews</h2>
+
+      <div class="two-col">
+        <div class="sub-panel outline-box">
+          <h3>Movie Reviews</h3>
+
+          <div class="list-container outline-box">
+            <div class="list-row list-header">
+              <div class="col col-main">Movie</div>
+              <div class="col col-meta">Rating</div>
+              <div class="col col-meta">Created</div>
+            </div>
+
+            <div class="list-row" *ngFor="let r of myMovieReviews">
+              <div class="col col-main">
+                <div class="title">{{ r?.title || r?.movieId || 'Unknown' }}</div>
+                <div class="sub">{{ r?.movieId ? ('ID: ' + r.movieId) : '' }}</div>
+              </div>
+              <div class="col col-meta">{{ r?.rating ?? '—' }}</div>
+              <div class="col col-meta">{{ r?.createdAt || '—' }}</div>
+            </div>
+
+            <div class="empty" *ngIf="myMovieReviews.length === 0">
+              No movie reviews yet.
+            </div>
+          </div>
+        </div>
+
+        <div class="sub-panel outline-box">
+          <h3>Series Reviews</h3>
+
+          <div class="list-container outline-box">
+            <div class="list-row list-header">
+              <div class="col col-main">Series</div>
+              <div class="col col-meta">Rating</div>
+              <div class="col col-meta">Created</div>
+            </div>
+
+            <div class="list-row" *ngFor="let r of mySeriesReviews">
+              <div class="col col-main">
+                <div class="title">{{ r?.title || r?.seriesId || 'Unknown' }}</div>
+                <div class="sub">{{ r?.seriesId ? ('ID: ' + r.seriesId) : '' }}</div>
+              </div>
+              <div class="col col-meta">{{ r?.rating ?? '—' }}</div>
+              <div class="col col-meta">{{ r?.createdAt || '—' }}</div>
+            </div>
+
+            <div class="empty" *ngIf="mySeriesReviews.length === 0">
+              No series reviews yet.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ ACTION MESSAGE CONTAINER (shows below the active/top panel) -->
+    <div *ngIf="actionMessageVisible"
+         class="action-message outline-box"
+         [class.action-message-success]="!actionMessageIsError"
+         [class.action-message-error]="actionMessageIsError">
+      <div class="action-message-text">{{ actionMessageText }}</div>
+      <button type="button" class="action-message-close" (click)="dismissActionMessage()">X</button>
+    </div>
+
   </div>
 </div>

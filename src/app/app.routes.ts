@@ -15,4 +15,5 @@ export const routes: Route[] = [
     {path: 'home', component: HomeComponent, canActivate: [AuthGuard]},
     {path: 'dashboard', component: DashboardComponent},
     {path: 'profile', component: UserProfile},
+    {path: 'profile/:uid', component: UserProfile}
 ];
