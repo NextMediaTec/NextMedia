@@ -4,6 +4,7 @@ import { RegisterComponent } from './register/register.component';
 import { HomeComponent } from './home/home.component';
 import { AuthGuard } from './guards/auth.guard';
 import { DashboardComponent } from './dashboard/dashboard';
+import { UserProfile } from './user-profile/user-profile';
 
 
 export const routes: Route[] = [
@@ -13,4 +14,6 @@ export const routes: Route[] = [
     {path: 'login', component: LoginComponent},
     {path: 'home', component: HomeComponent, canActivate: [AuthGuard]},
     {path: 'dashboard', component: DashboardComponent},
+    {path: 'profile', component: UserProfile},
+    {path: 'profile/:uid', component: UserProfile}
 ];

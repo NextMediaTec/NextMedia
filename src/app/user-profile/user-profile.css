@@ -1,0 +1,687 @@
+/* ---------------- Settings Layout ---------------- */
+.dashboard-container {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 2rem;
+  padding: 2rem;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* ---------------- Sidebar ---------------- */
+.Navbar {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 16px;
+  color: var(--app-fg);
+}
+
+.navbar a{
+  color: inherit;
+}
+
+.Navbar ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.Navbar ul li {
+  margin-bottom: 10px;
+}
+
+.Navbar ul li a {
+  display: block;
+  font-size: 1.05rem;
+  padding: 10px;
+  border-radius: 8px;
+  color: inherit;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  text-decoration: none;
+}
+
+.Navbar ul li a:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.divider {
+  height: 1px;
+  margin: 12px 0;
+  background: rgba(255, 255, 255, 0.10);
+}
+
+/* ---------------- Content ---------------- */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  color: var(--app-fg);
+}
+
+.content h2 {
+  font-size: 1.25rem;
+  margin: 0 0 1rem 0;
+}
+
+.content h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.75rem 0;
+  opacity: 0.95;
+}
+
+/* All containers must have visible outline */
+.outline-box {
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+}
+
+/* Panels */
+.panel {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  padding: 1.5rem;
+}
+
+/* ---------------- Profile header box ---------------- */
+.profile-header-box {
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.profile-header-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.profile-header-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profile-name {
+  font-weight: 700;
+}
+
+.profile-sub {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.profile-view-mode {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+/* ---------------- Input Groups ---------------- */
+.input-group {
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.input-group.full {
+  justify-content: stretch;
+}
+
+.outlined-input {
+  width: 250px;
+  padding: 10px 10px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid rgb(0, 0, 0);
+  background: rgba(122, 122, 122, 0.377);
+  color: var(--app-fg);
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.input-group.full .outlined-input {
+  width: 100%;
+}
+
+.outlined-input:focus {
+  border-color: rgba(106, 125, 255, 0.95);
+  box-shadow: 0 0 0 3px rgba(106, 125, 255, 0.18);
+}
+
+.outlined-input::placeholder {
+  color: rgb(0, 0, 0);
+}
+
+/* ---------------- Buttons ---------------- */
+button {
+  width: 250px;
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #040029;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.06s ease;
+  margin-top: 8px;
+}
+
+button:hover {
+  background-color: #0b0766;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:focus {
+  outline: 2px solid rgba(106, 125, 255, 0.95);
+  outline-offset: 2px;
+}
+
+.btn-secondary {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--app-fg);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+/* Small buttons in lists */
+.btn-small {
+  width: auto;
+  margin-top: 0;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 7px;
+}
+
+.btn-small.danger {
+  background: rgba(255, 60, 60, 0.20);
+  border: 1px solid rgba(255, 60, 60, 0.35);
+}
+
+.btn-small.danger:hover {
+  background: rgba(255, 60, 60, 0.28);
+}
+
+/* ---------------- Profile Picture Grid Picker ---------------- */
+.profile-picture-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.avatar-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+}
+
+.avatar-preview.small {
+  width: 48px;
+  height: 48px;
+  border-width: 1px;
+}
+
+.avatar-grid {
+  width: 100%;
+  max-width: 520px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.avatar-tile {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  margin-top: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  transition: transform 0.06s ease, border-color 0.15s ease, background-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-tile:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.avatar-tile:active {
+  transform: translateY(1px);
+}
+
+.avatar-tile.selected {
+  border-color: rgba(106, 125, 255, 0.95);
+  box-shadow: 0 0 0 3px rgba(106, 125, 255, 0.22);
+}
+
+.avatar-tile-img {
+  width: 85%;
+  height: 85%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.avatar-hint {
+  margin: 0;
+  opacity: 0.8;
+  font-size: 0.95rem;
+}
+
+/* ---------------- Lists ---------------- */
+.list-container {
+  border-radius: 10px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.list-row {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.list-header {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.12);
+  font-weight: 700;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.col-main .title {
+  font-weight: 700;
+}
+
+.col-main .sub {
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+.col-meta {
+  opacity: 0.9;
+  text-align: right;
+  justify-content: center;
+}
+
+.empty {
+  padding: 12px;
+  opacity: 0.85;
+}
+
+/* Friends */
+.friends-top {
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.friend-request-box {
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.friend-request-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.friend-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.friend-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.friend-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* badges */
+.badge {
+  display: inline-flex;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  width: fit-content;
+  margin-left: auto;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.badge-on {
+  border-color: rgba(106, 125, 255, 0.55);
+  background: rgba(106, 125, 255, 0.14);
+}
+
+/* layouts */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.sub-panel {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+/* list actions column */
+.col-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ✅ ACTION MESSAGE (replaces browser alert popups) */
+.action-message {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+}
+
+.action-message-success {
+  border-color: rgba(0, 180, 80, 0.85) !important;
+  background: rgba(0, 180, 80, 0.12);
+}
+
+.action-message-error {
+  border-color: rgba(220, 40, 40, 0.85) !important;
+  background: rgba(220, 40, 40, 0.12);
+}
+
+.action-message-text {
+  font-weight: 600;
+}
+
+.action-message-close {
+  width: auto;
+  margin-top: 0;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--app-fg);
+  border: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+.action-message-close:hover {
+  background: rgba(0, 0, 0, 0.28);
+}
+
+/* -------------------------------------------------------
+   ✅ NEW: FRIENDS VISUAL SEPARATION (friends vs requests)
+-------------------------------------------------------- */
+.panel-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.panel-title {
+  margin: 0;
+}
+
+.panel-chip {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  opacity: 0.95;
+}
+
+.friends-section {
+  border-radius: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.section-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.section-title {
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.section-sub {
+  opacity: 0.82;
+  font-size: 0.92rem;
+}
+
+.section-badge {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Left “accent bar” to clearly differentiate boxes */
+.friends-section-friends {
+  border-left: 4px solid rgba(106, 125, 255, 0.85);
+}
+
+.friends-section-incoming {
+  border-left: 4px solid rgba(0, 200, 120, 0.80);
+}
+
+.friends-section-outgoing {
+  border-left: 4px solid rgba(255, 170, 40, 0.85);
+}
+
+/* Badges matching the sections */
+.section-badge-friends {
+  border-color: rgba(106, 125, 255, 0.45);
+  background: rgba(106, 125, 255, 0.10);
+}
+
+.section-badge-incoming {
+  border-color: rgba(0, 200, 120, 0.45);
+  background: rgba(0, 200, 120, 0.10);
+}
+
+.section-badge-outgoing {
+  border-color: rgba(255, 170, 40, 0.50);
+  background: rgba(255, 170, 40, 0.10);
+}
+
+/* Friend list grid gets correct columns when actions exist */
+.friends-grid {
+  grid-template-columns: 1fr 140px;
+}
+
+.list-header.friends-grid {
+  grid-template-columns: 1fr 140px;
+}
+
+.friend-item-row.friends-grid {
+  grid-template-columns: 1fr 140px;
+}
+
+.list-header.friends-grid .col-actions,
+.friend-item-row.friends-grid .col-actions {
+  justify-content: flex-end;
+}
+
+.friend-item-row.friends-grid:has(.col-actions) {
+  grid-template-columns: 1fr 140px 200px;
+}
+
+.list-header.friends-grid:has(.col-actions) {
+  grid-template-columns: 1fr 140px 200px;
+}
+
+/* Make favorites pop visually inside friend list */
+.friend-item-fav {
+  border-color: rgba(106, 125, 255, 0.22);
+  background: rgba(106, 125, 255, 0.06);
+}
+
+.badge-fav {
+  border-color: rgba(106, 125, 255, 0.60);
+  background: rgba(106, 125, 255, 0.16);
+  font-weight: 800;
+}
+
+.badge-notfav {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Requests grid */
+.friend-requests-grid {
+  margin-top: 12px;
+}
+
+.request-grid {
+  grid-template-columns: 1fr 140px 200px;
+}
+
+.request-row {
+  border-color: rgba(255, 255, 255, 0.10);
+}
+
+/* Incoming vs Outgoing row background differences */
+.incoming-row {
+  background: rgba(0, 200, 120, 0.05);
+  border-color: rgba(0, 200, 120, 0.14);
+}
+
+.outgoing-row {
+  background: rgba(255, 170, 40, 0.05);
+  border-color: rgba(255, 170, 40, 0.14);
+}
+
+/* Make accept feel positive, different from generic button */
+.incoming-action {
+  background: rgba(0, 200, 120, 0.16);
+  border: 1px solid rgba(0, 200, 120, 0.30);
+}
+
+.incoming-action:hover {
+  background: rgba(0, 200, 120, 0.24);
+}
+
+@media (max-width: 900px) {
+  .dashboard-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    margin-top: 6vh;
+  }
+
+  .Navbar {
+    width: 100%;
+  }
+
+  .outlined-input,
+  button {
+    width: 100%;
+  }
+
+  .avatar-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .list-row {
+    grid-template-columns: 1fr;
+  }
+
+  .col-meta {
+    text-align: left;
+  }
+
+  /* Requests on mobile: stack columns */
+  .request-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .friends-grid,
+  .list-header.friends-grid,
+  .friend-item-row.friends-grid,
+  .list-header.friends-grid:has(.col-actions),
+  .friend-item-row.friends-grid:has(.col-actions) {
+    grid-template-columns: 1fr;
+  }
+
+  .col-actions {
+    justify-content: flex-start;
+  }
+
+  .badge {
+    margin-left: 0;
+  }
+}
