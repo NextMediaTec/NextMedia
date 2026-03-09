@@ -1,40 +1,45 @@
 <div class="dashboard">
-    
-        
-            <h1>Dashboard</h1>
-            <p class="subtitle">Welcome{{ username }} </p>
-        </div>
 
-        <div class="=links">
-            <div class="card">Movies</div>
-            <div class="card">Series</div>
-            <div class="card">My List</div>
-            <div class="card">Profile</div>
-        </div>
+
+    <h1 class="subtitle">Welcome {{ username }} </h1>
+<div class="main-layout">
+
+    <div class="featured">
+        <img src="assets/bigmovie.jpg" alt="featured movie" width="800">
+
+        <h2>Featured Movie</h2>
+        <p>Watch the trailer</p>
+        <button>Play</button>
+
+    </div>
+
+    <div class="side-content">
 
         <div class="section">
-            <h2>Continue Watching</h2>
-            <div class="row">
-                <div class="item" *ngFor="let item of continueWatching">
-                    <div class="box"></div>
-                    <div class="text">
-                        <div class="title">{{item.title}}</div>
-                        <div class="info">{{item.info}}</div>
-                    </div>
-                </div>
+            <h2>Continiue Watching</h2>
+            
+            <div class="movie">
+                <p><b>Interstellar</b></p>
+                <p>1h 12m left</p>
+            </div>
+
+            <div class="movie">
+                <p><b>Breaking Bad</b></p>
+                <p>Season 2 Episode 5</p>
+            </div>
+
+            <div class="movie">
+                <p><b>Dune</b></p>
+                <p>12m left</p>
             </div>
         </div>
+    </div>
+
+</div>
         
-        <div class="section">
-        <h2>Recommended</h2>
-        <div class="row">
-            <div class="item" *ngFor="let item of recommended">
-                <div ckass="box"></div>
-                <div class="text">
-                    <div class="title">{{item.title}}</div>
-                    <div class="info">{{item.info}}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+
+
+
         
+</div>

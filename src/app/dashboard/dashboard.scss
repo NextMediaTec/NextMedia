@@ -1,0 +1,21 @@
+.main-layout{
+    display: flex;
+    gap: 40px;
+}
+
+.featured{
+    flex: 2;
+    text-align: center;
+}
+
+.side-content{
+    flex: 1;
+
+}
+
+.movie{
+    margin-bottom: 10px;
+}
+.subtitle{
+    text-align: center;
+}
