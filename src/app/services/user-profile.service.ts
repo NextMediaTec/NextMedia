@@ -186,6 +186,7 @@ export class UserProfileService {
     }
 
     await this.ensurePathObjectExists(`users/${uid}/watchlistMovies`);
+    await this.ensurePathObjectExists(`users/${uid}/watchlistSeries`);
     await this.ensurePathObjectExists(`users/${uid}/favoriteMovies`);
     await this.ensurePathObjectExists(`users/${uid}/favoriteSeries`);
     await this.ensurePathObjectExists(`users/${uid}/movieReviews`);
@@ -213,9 +214,98 @@ export class UserProfileService {
     }
   }
 
+  public async addMovieToWatchlist(movieId: number): Promise<void> {
+    const user = this.requireUser();
+    const safeMovieId = Number(movieId);
+
+    if (!safeMovieId) {
+      throw new Error('Movie id is required.');
+    }
+
+    const path = `users/${user.uid}/watchlistMovies/${safeMovieId}`;
+
+    await set(ref(this.firebase.db, path), {
+      movieId: safeMovieId,
+      createdAt: new Date().toISOString()
+    });
+  }
+
+  public async removeMovieFromWatchlist(movieId: number): Promise<void> {
+    const user = this.requireUser();
+    const safeMovieId = Number(movieId);
+
+    if (!safeMovieId) {
+      return;
+    }
+
+    const path = `users/${user.uid}/watchlistMovies/${safeMovieId}`;
+    await remove(ref(this.firebase.db, path));
+  }
+
+  public async isMovieInMyWatchlist(movieId: number): Promise<boolean> {
+    const user = this.requireUser();
+    const safeMovieId = Number(movieId);
+
+    if (!safeMovieId) {
+      return false;
+    }
+
+    const path = `users/${user.uid}/watchlistMovies/${safeMovieId}`;
+    const snap: DataSnapshot = await get(ref(this.firebase.db, path));
+
+    return snap.exists();
+  }
+
+  public async addSeriesToWatchlist(seriesId: number): Promise<void> {
+    const user = this.requireUser();
+    const safeSeriesId = Number(seriesId);
+
+    if (!safeSeriesId) {
+      throw new Error('Series id is required.');
+    }
+
+    const path = `users/${user.uid}/watchlistSeries/${safeSeriesId}`;
+
+    await set(ref(this.firebase.db, path), {
+      seriesId: safeSeriesId,
+      createdAt: new Date().toISOString()
+    });
+  }
+
+  public async removeSeriesFromWatchlist(seriesId: number): Promise<void> {
+    const user = this.requireUser();
+    const safeSeriesId = Number(seriesId);
+
+    if (!safeSeriesId) {
+      return;
+    }
+
+    const path = `users/${user.uid}/watchlistSeries/${safeSeriesId}`;
+    await remove(ref(this.firebase.db, path));
+  }
+
+  public async isSeriesInMyWatchlist(seriesId: number): Promise<boolean> {
+    const user = this.requireUser();
+    const safeSeriesId = Number(seriesId);
+
+    if (!safeSeriesId) {
+      return false;
+    }
+
+    const path = `users/${user.uid}/watchlistSeries/${safeSeriesId}`;
+    const snap: DataSnapshot = await get(ref(this.firebase.db, path));
+
+    return snap.exists();
+  }
+
   public async getMyWatchlistMovies(): Promise<any[]> {
     const user = this.requireUser();
     return await this.readKeyedListAsArray(`users/${user.uid}/watchlistMovies`, 'movieId');
+  }
+
+  public async getMyWatchlistSeries(): Promise<any[]> {
+    const user = this.requireUser();
+    return await this.readKeyedListAsArray(`users/${user.uid}/watchlistSeries`, 'seriesId');
   }
 
   public async getMyFavoriteMovies(): Promise<any[]> {
@@ -232,6 +322,12 @@ export class UserProfileService {
     const safeUid = (uid || '').trim();
     if (safeUid.length === 0) return [];
     return await this.readKeyedListAsArray(`users/${safeUid}/watchlistMovies`, 'movieId');
+  }
+
+  public async getUserWatchlistSeriesByUid(uid: string): Promise<any[]> {
+    const safeUid = (uid || '').trim();
+    if (safeUid.length === 0) return [];
+    return await this.readKeyedListAsArray(`users/${safeUid}/watchlistSeries`, 'seriesId');
   }
 
   public async getUserFavoriteMoviesByUid(uid: string): Promise<any[]> {

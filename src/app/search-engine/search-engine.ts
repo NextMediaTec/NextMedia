@@ -3,7 +3,9 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgFor, NgIf } from '@angular/common';
 import { Unsubscribe } from 'firebase/database';
+import { Subscription } from 'rxjs';
 import { SearchEngineService, SearchEngineUserResult } from '../services/search-engine.service';
+import { TmdbMediaType, TmdbSearchMultiResult, TmdbService } from '../services/tmdb.service';
 
 @Component({
   selector: 'app-search-engine',
@@ -18,10 +20,15 @@ export class SearchEngine implements OnInit, OnDestroy {
   public filteredUsers: SearchEngineUserResult[] = [];
   public showResults: boolean = false;
 
+  public filteredMedia: TmdbSearchMultiResult[] = [];
+  public mediaLoading: boolean = false;
+
   private usersUnsubscribe: Unsubscribe | null = null;
+  private mediaSearchSubscription: Subscription | null = null;
 
   constructor(
     private searchEngineService: SearchEngineService,
+    private tmdbService: TmdbService,
     private router: Router
   ) {}
 
@@ -36,6 +43,11 @@ export class SearchEngine implements OnInit, OnDestroy {
     if (this.usersUnsubscribe) {
       this.usersUnsubscribe();
       this.usersUnsubscribe = null;
+    }
+
+    if (this.mediaSearchSubscription) {
+      this.mediaSearchSubscription.unsubscribe();
+      this.mediaSearchSubscription = null;
     }
   }
 
@@ -65,12 +77,53 @@ export class SearchEngine implements OnInit, OnDestroy {
     this.router.navigate(['/profile', safeUid]);
   }
 
+  public openMedia(item: TmdbSearchMultiResult): void {
+    const safeType = item.media_type;
+    const safeId = Number(item.id);
+
+    if ((safeType !== 'movie' && safeType !== 'tv') || !safeId) {
+      return;
+    }
+
+    this.showResults = false;
+    this.searchText = this.getMediaTitle(item);
+    this.router.navigate(['/show-movie', safeType, safeId]);
+  }
+
+  public getMediaTitle(item: TmdbSearchMultiResult): string {
+    return this.tmdbService.getDisplayTitle(item);
+  }
+
+  public getMediaDate(item: TmdbSearchMultiResult): string {
+    return this.tmdbService.getDisplayDate(item);
+  }
+
+  public getMediaPoster(path: string | null): string {
+    return this.tmdbService.getPosterUrl(path, 'w185');
+  }
+
+  public getMediaTypeLabel(mediaType: TmdbMediaType): string {
+    if (mediaType === 'movie') {
+      return 'Film';
+    }
+
+    return 'Serie';
+  }
+
   private applyFilter(): void {
     const q = this.searchText.trim().toLowerCase();
 
     if (q.length === 0) {
       this.filteredUsers = [];
+      this.filteredMedia = [];
+      this.mediaLoading = false;
       this.showResults = false;
+
+      if (this.mediaSearchSubscription) {
+        this.mediaSearchSubscription.unsubscribe();
+        this.mediaSearchSubscription = null;
+      }
+
       return;
     }
 
@@ -86,6 +139,26 @@ export class SearchEngine implements OnInit, OnDestroy {
     }
 
     this.filteredUsers = matches.slice(0, 10);
-    this.showResults = this.filteredUsers.length > 0;
+
+    if (this.mediaSearchSubscription) {
+      this.mediaSearchSubscription.unsubscribe();
+      this.mediaSearchSubscription = null;
+    }
+
+    this.mediaLoading = true;
+
+    this.mediaSearchSubscription = this.tmdbService.searchMulti(this.searchText.trim()).subscribe({
+      next: (response) => {
+        const items = Array.isArray(response?.data?.results) ? response.data.results : [];
+        this.filteredMedia = items.slice(0, 10);
+        this.mediaLoading = false;
+        this.showResults = this.filteredUsers.length > 0 || this.filteredMedia.length > 0;
+      },
+      error: () => {
+        this.filteredMedia = [];
+        this.mediaLoading = false;
+        this.showResults = this.filteredUsers.length > 0;
+      }
+    });
   }
 }
