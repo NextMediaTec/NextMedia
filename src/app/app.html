@@ -1,17 +1,5 @@
-<header class="navbar-frame">
-<nav class="navbar">
+<app-navbar></app-navbar>
 
-    <a routerLink="/dashboard">
-        <img src="assets/logo.png" alt="logo" class="logo" width="80">
-    </a>
-
-    <ul class="nav-links">
-        <a routerLink="/menu">Menu</a>
-        <a routerLink="/watch-list">Watchlist</a>
-        <a routerLink="/register">Signin</a>
-
-    </ul>
-
-</nav>
-</header>
-<router-outlet></router-outlet>
+<main class="page-content">
+  <router-outlet></router-outlet>
+</main>
