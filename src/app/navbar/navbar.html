@@ -55,8 +55,43 @@
 
     <div class="navbar-right">
       <app-search-engine></app-search-engine>
+      
+      <a
+      *ngIf="isLoggedIn"
+      class="profile-chip"
+      [routerLink]="getProfileRoute()"
+      >
+      <img
+      class="profile-avatar-image"
+      [src]="getAvatarSrcById(loggedInAvatarId)"
+      [alt]="loggedInUsername"
+      />
+      <div class="profile-info">
+        <span class="profile-name">{{ loggedInUsername }}</span>
+        <span class="profile-status">Logget ind</span>
+      </div>  
+    </a>
+    
 
-      <a class="profile-chip" [routerLink]="getProfileRoute()">
+    <div
+    *ngIf="!isLoggedIn"
+    class="profile-chip"
+    >
+      <img
+      class="profile-avatar-image"
+      [src]="getAvatarSrcById(loggedInAvatarId)"
+      [alt]="loggedInUsername"
+      />
+
+      <div class="profile-info">
+        <span class="profile-name">{{ loggedInUsername }}</span>
+        <span class="profile-status">Ikke logget ind</span>
+      </div>
+
+  </div>
+
+
+      <!-- <a class="profile-chip" [routerLink]="getProfileRoute()">
         <img
           class="profile-avatar-image"
           [src]="getAvatarSrcById(loggedInAvatarId)"
@@ -69,7 +104,7 @@
             {{ isLoggedIn ? 'Logget ind' : 'Ikke logget ind' }}
           </span>
         </div>
-      </a>
+      </a> -->
       <button
       *ngIf="isLoggedIn"
       class="logout-button"
