@@ -1,0 +1,72 @@
+<header class="navbar-shell">
+  <div class="navbar-panel outline-box">
+    <div class="navbar-left">
+      <a class="brand-link" routerLink="/dashboard">
+        <span class="brand-icon">🎬</span>
+        <span class="brand-text">NextMedia</span>
+      </a>
+    </div>
+
+    <nav class="navbar-center">
+      <a
+        class="nav-link"
+        routerLink="/dashboard"
+        routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        Dashboard
+      </a>
+
+      <a
+        class="nav-link"
+        routerLink="/home"
+        routerLinkActive="active-link"
+      >
+        Home
+      </a>
+
+      <a
+        class="nav-link"
+        [routerLink]="getProfileRoute()"
+        routerLinkActive="active-link"
+      >
+        Profile
+      </a>
+
+      <a
+        class="nav-link"
+        routerLink="/login"
+        routerLinkActive="active-link"
+      >
+        Login
+      </a>
+
+      <a
+        class="nav-link"
+        routerLink="/register"
+        routerLinkActive="active-link"
+      >
+        Register
+      </a>
+    </nav>
+
+    <div class="navbar-right">
+      <app-search-engine></app-search-engine>
+
+      <a class="profile-chip" [routerLink]="getProfileRoute()">
+        <img
+          class="profile-avatar-image"
+          [src]="getAvatarSrcById(loggedInAvatarId)"
+          [alt]="loggedInUsername"
+        />
+
+        <div class="profile-info">
+          <span class="profile-name">{{ loggedInUsername }}</span>
+          <span class="profile-status">
+            {{ isLoggedIn ? 'Logget ind' : 'Ikke logget ind' }}
+          </span>
+        </div>
+      </a>
+    </div>
+  </div>
+</header>
