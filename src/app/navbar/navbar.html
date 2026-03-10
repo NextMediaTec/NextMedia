@@ -26,6 +26,7 @@
       </a>
 
       <a
+        *ngIf="isLoggedIn"
         class="nav-link"
         [routerLink]="getProfileRoute()"
         routerLinkActive="active-link"
@@ -34,6 +35,7 @@
       </a>
 
       <a
+        *ngIf="!isLoggedIn"
         class="nav-link"
         routerLink="/login"
         routerLinkActive="active-link"
@@ -42,6 +44,7 @@
       </a>
 
       <a
+        *ngIf="!isLoggedIn"
         class="nav-link"
         routerLink="/register"
         routerLinkActive="active-link"
@@ -67,6 +70,18 @@
           </span>
         </div>
       </a>
+      <button
+      *ngIf="isLoggedIn"
+      class="logout-button"
+      type="button"
+      (click)="logout()"
+      aria-label="=Log ud"
+      title="Log ud"
+      >
+      <span class="logout-icon">🚪</span>
+      <span class="logout-text">Log Ud</span>
+    </button>
+
     </div>
   </div>
 </header>
