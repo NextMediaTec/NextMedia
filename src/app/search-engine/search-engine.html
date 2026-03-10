@@ -2,6 +2,23 @@
   <input
     type="text"
     [(ngModel)]="searchText"
-    placeholder="Søg efter film, serier eller brugere..."
+    (input)="onSearchInput()"
+    (focus)="onSearchFocus()"
+    (blur)="onSearchBlur()"
+    placeholder="Søg efter username..."
+    autocomplete="off"
   />
+
+  <div class="search-results" *ngIf="showResults">
+    <button
+      type="button"
+      class="search-result-item"
+      *ngFor="let user of filteredUsers"
+      (click)="openUserProfile(user)"
+    >
+      <div class="result-main">
+        <span class="result-username">{{ user.username }}</span>
+      </div>
+    </button>
+  </div>
 </div>

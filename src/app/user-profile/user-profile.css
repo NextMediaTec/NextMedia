@@ -3,9 +3,9 @@
   display: grid;
   grid-template-columns: 240px 1fr;
   gap: 2rem;
-  padding: 2rem;
-  min-height: 100vh;
+  padding: 1rem;
   box-sizing: border-box;
+  align-items: start;
 }
 
 /* ---------------- Sidebar ---------------- */
@@ -16,6 +16,8 @@
   border: 1px solid rgba(255, 255, 255, 0.22);
   padding: 16px;
   color: var(--app-fg);
+  height: fit-content;
+  align-self: start;
 }
 
 .navbar a{
@@ -213,6 +215,38 @@ button:focus {
 
 .btn-small.danger:hover {
   background: rgba(255, 60, 60, 0.28);
+}
+
+/* ---------------- Combined Profile Settings ---------------- */
+.settings-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settings-section {
+  border-radius: 12px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.settings-section-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.settings-section-title {
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.settings-section-sub {
+  font-size: 0.92rem;
+  opacity: 0.82;
 }
 
 /* ---------------- Profile Picture Grid Picker ---------------- */
@@ -525,7 +559,6 @@ button:focus {
   background: rgba(255, 255, 255, 0.04);
 }
 
-/* Left “accent bar” to clearly differentiate boxes */
 .friends-section-friends {
   border-left: 4px solid rgba(106, 125, 255, 0.85);
 }
@@ -538,7 +571,6 @@ button:focus {
   border-left: 4px solid rgba(255, 170, 40, 0.85);
 }
 
-/* Badges matching the sections */
 .section-badge-friends {
   border-color: rgba(106, 125, 255, 0.45);
   background: rgba(106, 125, 255, 0.10);
@@ -554,7 +586,6 @@ button:focus {
   background: rgba(255, 170, 40, 0.10);
 }
 
-/* Friend list grid gets correct columns when actions exist */
 .friends-grid {
   grid-template-columns: 1fr 140px;
 }
@@ -580,7 +611,6 @@ button:focus {
   grid-template-columns: 1fr 140px 200px;
 }
 
-/* Make favorites pop visually inside friend list */
 .friend-item-fav {
   border-color: rgba(106, 125, 255, 0.22);
   background: rgba(106, 125, 255, 0.06);
@@ -597,7 +627,6 @@ button:focus {
   background: rgba(255, 255, 255, 0.03);
 }
 
-/* Requests grid */
 .friend-requests-grid {
   margin-top: 12px;
 }
@@ -610,7 +639,6 @@ button:focus {
   border-color: rgba(255, 255, 255, 0.10);
 }
 
-/* Incoming vs Outgoing row background differences */
 .incoming-row {
   background: rgba(0, 200, 120, 0.05);
   border-color: rgba(0, 200, 120, 0.14);
@@ -621,7 +649,6 @@ button:focus {
   border-color: rgba(255, 170, 40, 0.14);
 }
 
-/* Make accept feel positive, different from generic button */
 .incoming-action {
   background: rgba(0, 200, 120, 0.16);
   border: 1px solid rgba(0, 200, 120, 0.30);
@@ -664,7 +691,6 @@ button:focus {
     text-align: left;
   }
 
-  /* Requests on mobile: stack columns */
   .request-grid {
     grid-template-columns: 1fr;
   }

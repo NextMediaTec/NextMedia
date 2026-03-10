@@ -1,11 +1,6 @@
 .navbar-shell {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
+  position: relative;
   box-sizing: border-box;
-  padding: 16px 24px;
 }
 
 .outline-box {
@@ -13,18 +8,12 @@
 }
 
 .navbar-panel {
-  width: 100%;
-  max-width: 1600px;
-  margin: 0 auto;
-  min-height: 74px;
   background: rgba(255, 255, 255, 0.02);
-  border-radius: 10px;
+  border-radius: 25;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
   color: var(--app-fg);
-  padding: 12px 16px;
   display: grid;
   grid-template-columns: 220px 1fr auto;
-  gap: 16px;
   align-items: center;
   box-sizing: border-box;
 }
@@ -33,10 +22,6 @@
   color: inherit;
 }
 
-.navbar-left {
-  display: flex;
-  align-items: center;
-}
 
 .brand-link {
   display: inline-flex;
@@ -60,13 +45,6 @@
   letter-spacing: 0.2px;
 }
 
-.navbar-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
 
 .nav-link {
   display: inline-flex;
@@ -173,11 +151,11 @@
 
 @media (max-width: 900px) {
   .navbar-shell {
-    padding: 12px 16px;
+    padding: 0;
   }
 
   .navbar-panel {
-    padding: 12px;
+    padding: 12px 16px;
   }
 
   .navbar-center {

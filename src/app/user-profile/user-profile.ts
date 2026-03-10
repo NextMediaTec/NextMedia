@@ -7,6 +7,7 @@ import { FirebaseService } from '../services/firebase.service';
 import { UserProfileService } from '../services/user-profile.service';
 import { ActivatedRoute } from '@angular/router';
 import { Unsubscribe } from 'firebase/database';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-user-profile',
@@ -28,9 +29,7 @@ export class UserProfile implements OnInit, OnDestroy {
   newPassword: string = '';
   confirmPassword: string = '';
 
-  isChangePassword: boolean = false;
-  isChangeUsername: boolean = false;
-  isChangeProfilePic: boolean = false;
+  isShowProfileSettings: boolean = false;
 
   defaultAvatarId: string = 'avatar-01';
   currentAvatarId: string = 'avatar-01';
@@ -81,6 +80,9 @@ export class UserProfile implements OnInit, OnDestroy {
   private unsubIncoming: Unsubscribe | null = null;
   private unsubOutgoing: Unsubscribe | null = null;
 
+  private authUnsubscribe: (() => void) | null = null;
+  private routeParamUnsubscribe: Subscription | null = null;
+
   actionMessageVisible: boolean = false;
   actionMessageText: string = '';
   actionMessageIsError: boolean = false;
@@ -98,88 +100,117 @@ export class UserProfile implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.optionChangeUsername();
+    this.optionShowProfileSettings();
 
-    onAuthStateChanged(this.firebaseService.auth, async (user: User | null) => {
-      if (!user) return;
-
-      this.user = user;
-
-      const routeUid = this.route.snapshot.paramMap.get('uid');
-      const queryUid = this.route.snapshot.queryParamMap.get('uid');
-
-      const candidateUid = (routeUid && routeUid.trim().length > 0)
-        ? routeUid.trim()
-        : ((queryUid && queryUid.trim().length > 0) ? queryUid.trim() : '');
-
-      if (candidateUid.length > 0) {
-        this.viewedUid = candidateUid;
-      } else {
-        this.viewedUid = user.uid;
-      }
-
-      this.isOwner = this.viewedUid === user.uid;
-
-      try {
-        if (this.isOwner) {
-          const profile = await this.userProfileService.getMyProfile();
-
-          this.currentUsername = profile?.username || 'Not set';
-          this.currentEmail = profile?.email || 'Not set';
-          this.currentRole = profile?.role || 'Not set';
-          this.currentCreatedAt = profile?.createdAt || 'Not set';
-
-          const ensuredAvatarId = await this.userProfileService.ensureMyAvatarIdExists(this.defaultAvatarId);
-
-          if (this.isAvatarIdValid(ensuredAvatarId)) {
-            this.currentAvatarId = ensuredAvatarId;
-          } else {
-            this.currentAvatarId = this.defaultAvatarId;
-            await this.userProfileService.setMyAvatarId(this.defaultAvatarId);
-          }
-        } else {
-          const profileOther = await this.userProfileService.getUserProfileByUid(this.viewedUid);
-
-          this.currentUsername = profileOther?.username || 'Not set';
-          this.currentEmail = profileOther?.email || 'Not set';
-          this.currentRole = profileOther?.role || 'Not set';
-          this.currentCreatedAt = profileOther?.createdAt || 'Not set';
-
-          const otherAvatarId = profileOther?.avatarId || this.defaultAvatarId;
-
-          if (this.isAvatarIdValid(otherAvatarId)) {
-            this.currentAvatarId = otherAvatarId;
-          } else {
-            this.currentAvatarId = this.defaultAvatarId;
-          }
+    this.authUnsubscribe = onAuthStateChanged(this.firebaseService.auth, (user: User | null) => {
+      this.ngZone.run(() => {
+        if (!user) {
+          this.user = null;
+          this.viewedUid = '';
+          this.isOwner = false;
+          this.teardownRealtimeSubscriptions();
+          this.cdr.detectChanges();
+          return;
         }
-      } catch (err) {
-        this.showActionMessage('Error loading user profile.', true);
-      }
 
-      if (this.isOwner) {
-        try {
-          await this.userProfileService.ensureMyUserSubNodesExist();
-        } catch (err) {
-          this.showActionMessage('Error ensuring user nodes.', true);
+        this.user = user;
+
+        if (this.routeParamUnsubscribe) {
+          this.routeParamUnsubscribe.unsubscribe();
+          this.routeParamUnsubscribe = null;
         }
-      }
 
-      this.setupRealtimeSubscriptions();
+        this.routeParamUnsubscribe = this.route.paramMap.subscribe(async params => {
+          const routeUid = params.get('uid');
+          const queryUid = this.route.snapshot.queryParamMap.get('uid');
 
-      if (this.isOwner) {
-        this.optionChangeUsername();
-      } else {
-        this.optionShowWatchlist();
-      }
+          const candidateUid = (routeUid && routeUid.trim().length > 0)
+            ? routeUid.trim()
+            : ((queryUid && queryUid.trim().length > 0) ? queryUid.trim() : '');
 
-      this.cdr.detectChanges();
+          if (candidateUid.length > 0) {
+            this.viewedUid = candidateUid;
+          } else {
+            this.viewedUid = user.uid;
+          }
+
+          this.isOwner = this.viewedUid === user.uid;
+
+          await this.reloadViewedProfile();
+
+          if (this.isOwner) {
+            this.optionShowProfileSettings();
+          } else {
+            this.optionShowWatchlist();
+          }
+
+          this.cdr.detectChanges();
+        });
+      });
     });
   }
 
   ngOnDestroy(): void {
     this.teardownRealtimeSubscriptions();
     this.dismissActionMessage();
+
+    if (this.authUnsubscribe) {
+      this.authUnsubscribe();
+      this.authUnsubscribe = null;
+    }
+
+    if (this.routeParamUnsubscribe) {
+      this.routeParamUnsubscribe.unsubscribe();
+      this.routeParamUnsubscribe = null;
+    }
+  }
+
+  private async reloadViewedProfile(): Promise<void> {
+    try {
+      if (this.isOwner) {
+        const profile = await this.userProfileService.getMyProfile();
+
+        this.currentUsername = profile?.username || 'Not set';
+        this.currentEmail = profile?.email || 'Not set';
+        this.currentRole = profile?.role || 'Not set';
+        this.currentCreatedAt = profile?.createdAt || 'Not set';
+
+        const ensuredAvatarId = await this.userProfileService.ensureMyAvatarIdExists(this.defaultAvatarId);
+
+        if (this.isAvatarIdValid(ensuredAvatarId)) {
+          this.currentAvatarId = ensuredAvatarId;
+        } else {
+          this.currentAvatarId = this.defaultAvatarId;
+          await this.userProfileService.setMyAvatarId(this.defaultAvatarId);
+        }
+
+        try {
+          await this.userProfileService.ensureMyUserSubNodesExist();
+        } catch (err) {
+          this.showActionMessage('Error ensuring user nodes.', true);
+        }
+      } else {
+        const profileOther = await this.userProfileService.getUserProfileByUid(this.viewedUid);
+
+        this.currentUsername = profileOther?.username || 'Not set';
+        this.currentEmail = profileOther?.email || 'Not set';
+        this.currentRole = profileOther?.role || 'Not set';
+        this.currentCreatedAt = profileOther?.createdAt || 'Not set';
+
+        const otherAvatarId = profileOther?.avatarId || this.defaultAvatarId;
+
+        if (this.isAvatarIdValid(otherAvatarId)) {
+          this.currentAvatarId = otherAvatarId;
+        } else {
+          this.currentAvatarId = this.defaultAvatarId;
+        }
+      }
+    } catch (err) {
+      this.showActionMessage('Error loading user profile.', true);
+    }
+
+    this.setupRealtimeSubscriptions();
+    this.cdr.detectChanges();
   }
 
   private showActionMessage(text: string, isError: boolean): void {
@@ -377,38 +408,8 @@ export class UserProfile implements OnInit, OnDestroy {
     this.outgoingFriendRequests = [...next];
   }
 
-  optionChangePassword(): void {
-    this.isChangePassword = true;
-    this.isChangeUsername = false;
-    this.isChangeProfilePic = false;
-
-    this.isShowWatchlist = false;
-    this.isShowFavorites = false;
-    this.isShowFriends = false;
-    this.isShowFriendRequests = false;
-    this.isShowMyReviews = false;
-
-    this.cdr.detectChanges();
-  }
-
-  optionChangeUsername(): void {
-    this.isChangeUsername = true;
-    this.isChangePassword = false;
-    this.isChangeProfilePic = false;
-
-    this.isShowWatchlist = false;
-    this.isShowFavorites = false;
-    this.isShowFriends = false;
-    this.isShowFriendRequests = false;
-    this.isShowMyReviews = false;
-
-    this.cdr.detectChanges();
-  }
-
-  optionChangeProfilePic(): void {
-    this.isChangeProfilePic = true;
-    this.isChangePassword = false;
-    this.isChangeUsername = false;
+  optionShowProfileSettings(): void {
+    this.isShowProfileSettings = true;
 
     this.isShowWatchlist = false;
     this.isShowFavorites = false;
@@ -426,9 +427,7 @@ export class UserProfile implements OnInit, OnDestroy {
     this.isShowFriendRequests = false;
     this.isShowMyReviews = false;
 
-    this.isChangePassword = false;
-    this.isChangeUsername = false;
-    this.isChangeProfilePic = false;
+    this.isShowProfileSettings = false;
 
     this.cdr.detectChanges();
   }
@@ -440,9 +439,7 @@ export class UserProfile implements OnInit, OnDestroy {
     this.isShowFriendRequests = false;
     this.isShowMyReviews = false;
 
-    this.isChangePassword = false;
-    this.isChangeUsername = false;
-    this.isChangeProfilePic = false;
+    this.isShowProfileSettings = false;
 
     this.cdr.detectChanges();
   }
@@ -454,9 +451,7 @@ export class UserProfile implements OnInit, OnDestroy {
     this.isShowFriendRequests = false;
     this.isShowMyReviews = false;
 
-    this.isChangePassword = false;
-    this.isChangeUsername = false;
-    this.isChangeProfilePic = false;
+    this.isShowProfileSettings = false;
 
     this.cdr.detectChanges();
   }
@@ -468,9 +463,7 @@ export class UserProfile implements OnInit, OnDestroy {
     this.isShowFriends = false;
     this.isShowFriendRequests = false;
 
-    this.isChangePassword = false;
-    this.isChangeUsername = false;
-    this.isChangeProfilePic = false;
+    this.isShowProfileSettings = false;
 
     this.cdr.detectChanges();
   }
