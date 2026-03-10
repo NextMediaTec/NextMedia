@@ -1,14 +1,20 @@
 import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { FirebaseService } from '../services/firebase.service';
 import { ref, onValue, Unsubscribe } from 'firebase/database';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { SearchEngine } from '../search-engine/search-engine';
+import { AuthService } from '../services/auth.service';
+import { CommonModule } from '@angular/common';
+
+
+
+
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, SearchEngine],
+  imports: [CommonModule, RouterLink, RouterLinkActive, SearchEngine],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss'
 })
@@ -39,7 +45,9 @@ export class Navbar implements OnInit, OnDestroy {
 
   constructor(
     private firebase: FirebaseService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -158,6 +166,15 @@ export class Navbar implements OnInit, OnDestroy {
     }
 
     return 'assets/avatars/cat.png';
+  }
+
+  public async logout(): Promise<void> {
+    try{
+      await this.authService.logout();
+      await this.router.navigate(['/login']);
+    }catch (error) {
+      console.error('Logout failed:', error);
+    }
   }
 
   private isAvatarIdValid(avatarId: string): boolean {

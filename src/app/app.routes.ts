@@ -7,6 +7,7 @@ import { DashboardComponent } from './dashboard/dashboard';
 import { UserProfile } from './user-profile/user-profile';
 
 
+
 export const routes: Route[] = [
 
     {path: '', redirectTo: '/login', pathMatch: 'full'},
@@ -16,4 +17,5 @@ export const routes: Route[] = [
     {path: 'dashboard', component: DashboardComponent},
     {path: 'profile', component: UserProfile},
     {path: 'profile/:uid', component: UserProfile}
+
 ];
