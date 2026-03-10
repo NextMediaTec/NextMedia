@@ -22,9 +22,7 @@
     </div>
 
     <ul>
-      <li *ngIf="isOwner"><a href="javascript:void(0)" (click)="optionChangePassword()">Change Password</a></li>
-      <li *ngIf="isOwner"><a href="javascript:void(0)" (click)="optionChangeUsername()">Change Username</a></li>
-      <li *ngIf="isOwner"><a href="javascript:void(0)" (click)="optionChangeProfilePic()">Change Profile Picture</a></li>
+      <li *ngIf="isOwner"><a href="javascript:void(0)" (click)="optionShowProfileSettings()">Profile Settings</a></li>
 
       <li class="divider"></li>
 
@@ -36,48 +34,84 @@
   </div>
 
   <div class="content">
-    <div *ngIf="isChangePassword" class="panel outline-box">
-      <h2>Change Password</h2>
-      <div class="input-group">
-        <input class="outlined-input" type="password" [value]="newPassword" (input)="updatePassword($event)" placeholder="New Password"/>
+    <div *ngIf="isShowProfileSettings" class="panel outline-box">
+      <div class="panel-title-row">
+        <h2 class="panel-title">Profile Settings</h2>
+        <span class="panel-chip">Username, password and picture</span>
       </div>
-      <div class="input-group">
-        <input class="outlined-input" type="password" [value]="confirmPassword" (input)="updateConfirmPassword($event)" placeholder="Confirm Password"/>
-      </div>
-      <button (click)="submitNewPassword()">Submit</button>
-    </div>
 
-    <div *ngIf="isChangeUsername" class="panel outline-box">
-      <h2>Change Username</h2>
-      <p>Current Username: {{ currentUsername || 'Not set' }}</p><br/>
-      <div class="input-group">
-        <input class="outlined-input" type="text" [value]="newUsername" (input)="updateUsername($event)" placeholder="New Username"/>
-      </div>
-      <button (click)="submitNewUsername()">Submit</button>
-    </div>
+      <div class="settings-stack">
+        <div class="settings-section outline-box">
+          <div class="settings-section-head">
+            <div class="settings-section-title">Change Username</div>
+            <div class="settings-section-sub">Current Username: {{ currentUsername || 'Not set' }}</div>
+          </div>
 
-    <div *ngIf="isChangeProfilePic" class="panel outline-box">
-      <h2>Change Profile Picture</h2>
+          <div class="input-group">
+            <input
+              class="outlined-input"
+              type="text"
+              [value]="newUsername"
+              (input)="updateUsername($event)"
+              placeholder="New Username"
+            />
+          </div>
 
-      <div class="profile-picture-picker">
-        <img [src]="getAvatarSrcById(currentAvatarId)" alt="Profile Picture" class="avatar-preview"/>
-
-        <div class="avatar-grid">
-          <button
-            type="button"
-            class="avatar-tile"
-            *ngFor="let a of avatarOptions"
-            (click)="selectAvatar(a.id)"
-            [class.selected]="a.id === currentAvatarId"
-            [attr.aria-pressed]="a.id === currentAvatarId"
-          >
-            <img [src]="a.src" [alt]="a.id" class="avatar-tile-img"/>
-          </button>
+          <button (click)="submitNewUsername()">Submit Username</button>
         </div>
 
-        <p class="avatar-hint">
-          Click an avatar to set it as your profile picture.
-        </p>
+        <div class="settings-section outline-box">
+          <div class="settings-section-head">
+            <div class="settings-section-title">Change Password</div>
+            <div class="settings-section-sub">Enter your new password twice</div>
+          </div>
+
+          <div class="input-group">
+            <input
+              class="outlined-input"
+              type="password"
+              [value]="newPassword"
+              (input)="updatePassword($event)"
+              placeholder="New Password"
+            />
+          </div>
+
+          <div class="input-group">
+            <input
+              class="outlined-input"
+              type="password"
+              [value]="confirmPassword"
+              (input)="updateConfirmPassword($event)"
+              placeholder="Confirm Password"
+            />
+          </div>
+
+          <button (click)="submitNewPassword()">Submit Password</button>
+        </div>
+
+        <div class="settings-section outline-box">
+          <div class="settings-section-head">
+            <div class="settings-section-title">Change Profile Picture</div>
+            <div class="settings-section-sub">Click an avatar to set it as your profile picture</div>
+          </div>
+
+          <div class="profile-picture-picker">
+            <img [src]="getAvatarSrcById(currentAvatarId)" alt="Profile Picture" class="avatar-preview"/>
+
+            <div class="avatar-grid">
+              <button
+                type="button"
+                class="avatar-tile"
+                *ngFor="let a of avatarOptions"
+                (click)="selectAvatar(a.id)"
+                [class.selected]="a.id === currentAvatarId"
+                [attr.aria-pressed]="a.id === currentAvatarId"
+              >
+                <img [src]="a.src" [alt]="a.id" class="avatar-tile-img"/>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -156,7 +190,6 @@
       </div>
     </div>
 
-    <!-- ✅ FRIENDS SECTION (VISUALLY SPLIT INTO DISTINCT BOXES) -->
     <div *ngIf="isShowFriends" class="panel outline-box">
       <div class="panel-title-row">
         <h2 class="panel-title">Friends</h2>
@@ -185,7 +218,6 @@
         </div>
       </div>
 
-      <!-- ✅ FRIEND LIST (own distinct box) -->
       <div class="friends-section friends-section-friends outline-box">
         <div class="section-head">
           <div class="section-left">
@@ -236,9 +268,7 @@
         </div>
       </div>
 
-      <!-- ✅ REQUESTS SPLIT (incoming vs outgoing have distinct colors + labels) -->
       <div class="two-col friend-requests-grid" *ngIf="isOwner">
-        <!-- Incoming -->
         <div class="friends-section friends-section-incoming outline-box">
           <div class="section-head">
             <div class="section-left">
@@ -274,7 +304,6 @@
           </div>
         </div>
 
-        <!-- Outgoing -->
         <div class="friends-section friends-section-outgoing outline-box">
           <div class="section-head">
             <div class="section-left">
@@ -367,7 +396,6 @@
       </div>
     </div>
 
-    <!-- ✅ ACTION MESSAGE CONTAINER (shows below the active/top panel) -->
     <div *ngIf="actionMessageVisible"
          class="action-message outline-box"
          [class.action-message-success]="!actionMessageIsError"
