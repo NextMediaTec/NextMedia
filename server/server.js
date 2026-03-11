@@ -122,7 +122,6 @@ app.get('/api/tmdb/details/:mediaType/:id', async (req, res) => {
         message: 'Id mangler.'
       });
     }
-
     const url = new URL(`${TMDB_BASE_URL}/${mediaType}/${id}`);
     url.searchParams.set('language', language);
     url.searchParams.set('append_to_response', 'credits,videos,images,recommendations');
