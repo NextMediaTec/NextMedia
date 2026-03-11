@@ -18,7 +18,7 @@ export const routes: Route[] = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'profile', component: UserProfile },
   { path: 'profile/:uid', component: UserProfile },
-  { path: 'show-movie/:mediaType/:id', component: ShowMovieComponent }
+  { path: 'show-movie/:mediaType/:id', component: ShowMovieComponent },
 
     {path: '', redirectTo: '/login', pathMatch: 'full'},
     {path: 'register', component: RegisterComponent},
