@@ -1,0 +1,162 @@
+<div class="show-movie-page">
+  <div class="show-movie-state" *ngIf="loading">
+    Henter information...
+  </div>
+
+  <div class="show-movie-state error" *ngIf="!loading && errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="show-movie-content" *ngIf="!loading && details">
+    <div
+      class="hero-backdrop"
+      *ngIf="getBackdropUrl()"
+      [style.background-image]="'linear-gradient(rgba(10, 10, 10, 0.72), rgba(10, 10, 10, 0.94)), url(' + getBackdropUrl() + ')'"
+    ></div>
+
+    <div class="hero-content">
+      <div class="poster-column">
+        <img
+          class="poster-image"
+          *ngIf="getPosterUrl()"
+          [src]="getPosterUrl()"
+          [alt]="getTitle()"
+        />
+      </div>
+
+      <div class="info-column">
+        <div class="media-type-badge">
+          {{ mediaType === 'movie' ? 'Film' : 'Serie' }}
+        </div>
+
+        <h1 class="title">
+          {{ getTitle() }}
+        </h1>
+
+        <div class="tagline" *ngIf="details.tagline">
+          {{ details.tagline }}
+        </div>
+
+        <div class="meta-line">
+          <span *ngIf="getDate()">{{ getDate() }}</span>
+          <span *ngIf="getRuntimeText()">• {{ getRuntimeText() }}</span>
+          <span *ngIf="details.vote_average">• {{ details.vote_average | number:'1.1-1' }}/10</span>
+        </div>
+
+        <div class="genres" *ngIf="getGenresText()">
+          {{ getGenresText() }}
+        </div>
+
+        <div class="watchlist-actions">
+          <button
+            type="button"
+            class="watchlist-button"
+            [class.in-watchlist]="isInWatchlist"
+            [disabled]="watchlistLoading"
+            (click)="toggleWatchlist()"
+          >
+            <span *ngIf="!watchlistLoading && !isInWatchlist">
+              Tilføj til watchlist
+            </span>
+
+            <span *ngIf="!watchlistLoading && isInWatchlist">
+              Fjern fra watchlist
+            </span>
+
+            <span *ngIf="watchlistLoading">
+              Opdaterer...
+            </span>
+          </button>
+
+          <div class="watchlist-message" *ngIf="watchlistMessage">
+            {{ watchlistMessage }}
+          </div>
+        </div>
+
+        <div class="overview-block" *ngIf="details.overview">
+          <div class="section-heading">Overview</div>
+          <p class="overview-text">{{ details.overview }}</p>
+        </div>
+
+        <div class="facts-grid">
+          <div class="fact-card" *ngIf="details.status">
+            <div class="fact-label">Status</div>
+            <div class="fact-value">{{ details.status }}</div>
+          </div>
+
+          <div class="fact-card" *ngIf="details.original_language">
+            <div class="fact-label">Original language</div>
+            <div class="fact-value">{{ details.original_language }}</div>
+          </div>
+
+          <div class="fact-card" *ngIf="details.number_of_seasons">
+            <div class="fact-label">Seasons</div>
+            <div class="fact-value">{{ details.number_of_seasons }}</div>
+          </div>
+
+          <div class="fact-card" *ngIf="details.number_of_episodes">
+            <div class="fact-label">Episodes</div>
+            <div class="fact-value">{{ details.number_of_episodes }}</div>
+          </div>
+
+          <div class="fact-card" *ngIf="details.budget">
+            <div class="fact-label">Budget</div>
+            <div class="fact-value">{{ details.budget | number }}</div>
+          </div>
+
+          <div class="fact-card" *ngIf="details.revenue">
+            <div class="fact-label">Revenue</div>
+            <div class="fact-value">{{ details.revenue | number }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-sections">
+      <div class="section-block" *ngIf="getTopCast().length > 0">
+        <h2 class="section-title">Cast</h2>
+
+        <div class="cast-grid">
+          <div class="cast-card" *ngFor="let actor of getTopCast()">
+            <img
+              class="cast-image"
+              *ngIf="getCastProfile(actor.profile_path)"
+              [src]="getCastProfile(actor.profile_path)"
+              [alt]="actor.name"
+            />
+
+            <div class="cast-name">{{ actor.name }}</div>
+            <div class="cast-character" *ngIf="actor.character">{{ actor.character }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block" *ngIf="getRecommendations().length > 0">
+        <h2 class="section-title">Recommendations</h2>
+
+        <div class="recommendations-grid">
+          <a
+            class="recommendation-card"
+            *ngFor="let item of getRecommendations()"
+            [routerLink]="['/show-movie', item.media_type ? item.media_type : mediaType, item.id]"
+          >
+            <img
+              class="recommendation-poster"
+              *ngIf="getRecommendationPoster(item.poster_path)"
+              [src]="getRecommendationPoster(item.poster_path)"
+              [alt]="getRecommendationTitle(item)"
+            />
+
+            <div class="recommendation-title">
+              {{ getRecommendationTitle(item) }}
+            </div>
+
+            <div class="recommendation-date" *ngIf="getRecommendationDate(item)">
+              {{ getRecommendationDate(item) }}
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

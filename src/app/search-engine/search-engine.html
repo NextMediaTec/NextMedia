@@ -1,24 +1,58 @@
-<div class="search-box">
+<div class="search-engine">
   <input
     type="text"
     [(ngModel)]="searchText"
     (input)="onSearchInput()"
     (focus)="onSearchFocus()"
     (blur)="onSearchBlur()"
-    placeholder="Søg efter username..."
-    autocomplete="off"
+    placeholder="Søg efter brugere, film eller serier"
   />
 
   <div class="search-results" *ngIf="showResults">
-    <button
-      type="button"
-      class="search-result-item"
-      *ngFor="let user of filteredUsers"
-      (click)="openUserProfile(user)"
-    >
-      <div class="result-main">
-        <span class="result-username">{{ user.username }}</span>
+    <div class="search-section" *ngIf="filteredUsers.length > 0">
+      <div class="search-section-title">Brugere</div>
+
+      <div
+        class="search-result-item user-result"
+        *ngFor="let user of filteredUsers"
+        (mousedown)="openUserProfile(user)"
+      >
+        <div class="result-main-text">
+          {{ user.username }}
+        </div>
       </div>
-    </button>
+    </div>
+
+    <div class="search-section" *ngIf="filteredMedia.length > 0">
+      <div class="search-section-title">Film og serier</div>
+
+      <div
+        class="search-result-item media-result"
+        *ngFor="let item of filteredMedia"
+        (mousedown)="openMedia(item)"
+      >
+        <img
+          class="media-poster"
+          *ngIf="getMediaPoster(item.poster_path)"
+          [src]="getMediaPoster(item.poster_path)"
+          [alt]="getMediaTitle(item)"
+        />
+
+        <div class="media-texts">
+          <div class="result-main-text">
+            {{ getMediaTitle(item) }}
+          </div>
+
+          <div class="result-sub-text">
+            {{ getMediaTypeLabel(item.media_type) }}
+            <span *ngIf="getMediaDate(item)">• {{ getMediaDate(item) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="search-section" *ngIf="mediaLoading">
+      <div class="search-loading-text">Henter film og serier...</div>
+    </div>
   </div>
 </div>

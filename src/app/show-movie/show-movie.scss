@@ -1,0 +1,338 @@
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.show-movie-page {
+  position: relative;
+  min-height: 100vh;
+  color: var(--app-fg, #ffffff);
+  background: #0c0c0c;
+}
+
+.show-movie-state {
+  padding: 32px;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.show-movie-state.error {
+  color: #ff8f8f;
+}
+
+.show-movie-content {
+  position: relative;
+  min-height: 100vh;
+}
+
+.hero-backdrop {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 680px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 32px;
+  align-items: start;
+  padding: 48px 40px 24px 40px;
+  box-sizing: border-box;
+}
+
+.poster-column {
+  width: 100%;
+}
+
+.poster-image {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.info-column {
+  min-width: 0;
+  padding-top: 8px;
+}
+
+.media-type-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(32px, 4vw, 56px);
+  line-height: 1.05;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.tagline {
+  margin-top: 12px;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.78);
+  font-style: italic;
+}
+
+.meta-line {
+  margin-top: 16px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.genres {
+  margin-top: 14px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.watchlist-actions {
+  margin-top: 20px;
+}
+
+.watchlist-button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.watchlist-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-1px);
+}
+
+.watchlist-button:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.watchlist-button.in-watchlist {
+  background: rgba(106, 125, 255, 0.22);
+  border-color: rgba(106, 125, 255, 0.75);
+}
+
+.watchlist-message {
+  margin-top: 10px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.overview-block {
+  margin-top: 28px;
+  max-width: 900px;
+}
+
+.section-heading {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.66);
+  margin-bottom: 10px;
+}
+
+.overview-text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.facts-grid {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  max-width: 1000px;
+}
+
+.fact-card {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+}
+
+.fact-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 6px;
+}
+
+.fact-value {
+  font-size: 15px;
+  color: #ffffff;
+  word-break: break-word;
+}
+
+.content-sections {
+  position: relative;
+  z-index: 1;
+  padding: 8px 40px 48px 40px;
+  box-sizing: border-box;
+}
+
+.section-block {
+  margin-top: 36px;
+}
+
+.section-title {
+  margin: 0 0 18px 0;
+  font-size: 26px;
+  line-height: 1.2;
+  color: #ffffff;
+}
+
+.cast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.cast-card {
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-sizing: border-box;
+}
+
+.cast-image {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.cast-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.35;
+}
+
+.cast-character {
+  margin-top: 4px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.35;
+}
+
+.recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 18px;
+}
+
+.recommendation-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
+  box-sizing: border-box;
+}
+
+.recommendation-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.recommendation-poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.recommendation-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.35;
+}
+
+.recommendation-date {
+  margin-top: 4px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+@media (max-width: 980px) {
+  .hero-content {
+    grid-template-columns: 1fr;
+    padding: 32px 20px 20px 20px;
+  }
+
+  .poster-column {
+    max-width: 300px;
+  }
+
+  .content-sections {
+    padding: 8px 20px 40px 20px;
+  }
+
+  .hero-backdrop {
+    height: 560px;
+  }
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 32px;
+  }
+
+  .meta-line,
+  .genres,
+  .overview-text {
+    font-size: 14px;
+  }
+
+  .cast-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  }
+
+  .recommendations-grid {
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+  }
+}

@@ -4,13 +4,13 @@
   max-width: 420px;
 }
 
-.search-box {
+.search-engine {
   position: relative;
   width: 100%;
   max-width: 420px;
 }
 
-.search-box input {
+.search-engine input {
   width: 100%;
   box-sizing: border-box;
   padding: 12px 14px;
@@ -24,12 +24,12 @@
   transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.search-box input:focus {
+.search-engine input:focus {
   border-color: rgba(106, 125, 255, 0.95);
   box-shadow: 0 0 0 3px rgba(106, 125, 255, 0.18);
 }
 
-.search-box input::placeholder {
+.search-engine input::placeholder {
   color: rgb(0, 0, 0);
 }
 
@@ -45,44 +45,87 @@
   z-index: 1000;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
   color: #ffffff;
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.search-section {
+  width: 100%;
+}
+
+.search-section + .search-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.search-section-title {
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .search-result-item {
   width: 100%;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   text-align: left;
   background: transparent;
   border: none;
   color: #ffffff;
   padding: 12px 14px;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 .search-result-item:hover {
   background: rgba(255, 255, 255, 0.06);
 }
 
-.result-main {
-  display: flex;
-  align-items: center;
-  color: #ffffff;
+.user-result {
+  justify-content: flex-start;
 }
 
-.result-username {
+.media-result {
+  justify-content: flex-start;
+}
+
+.result-main-text {
   font-size: 14px;
   font-weight: 500;
   color: #ffffff;
+  line-height: 1.35;
 }
 
-.result-email {
+.result-sub-text {
   font-size: 12px;
   opacity: 0.78;
   color: rgba(255, 255, 255, 0.78);
+  line-height: 1.35;
+  margin-top: 2px;
 }
 
-.no-results {
+.media-poster {
+  width: 42px;
+  min-width: 42px;
+  height: 62px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.media-texts {
+  min-width: 0;
+  display: block;
+}
+
+.search-loading-text {
   padding: 12px 14px;
   color: rgba(255, 255, 255, 0.78);
+  font-size: 13px;
 }
 
 @media (max-width: 900px) {
@@ -90,7 +133,7 @@
     max-width: 100%;
   }
 
-  .search-box {
+  .search-engine {
     max-width: 100%;
   }
 }
