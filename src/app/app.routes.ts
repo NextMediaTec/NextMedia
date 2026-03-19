@@ -35,16 +35,9 @@ export const routes: Route[] = [
     {path: 'profile', component: UserProfile, canActivate: [AuthGuard]},
     {path: 'profile/:uid', component: UserProfile, canActivate: [AuthGuard]},
     {path: 'forgot-password', component: ForgotPasswordComponent},
-    {path: 'admin', component: Adminpage, canActivate: [AdminGuard]}
+    {path: 'admin', component: Adminpage, canActivate: [AdminGuard]},
 
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: 'register', component: RegisterComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
-  { path: 'dashboard', component: DashboardComponent },
-  { path: 'profile', component: UserProfile, canActivate: [AuthGuard] },
-  { path: 'profile/:uid', component: UserProfile, canActivate: [AuthGuard] },
-  { path: 'forgot-password', component: ForgotPasswordComponent },
+
 
   { path: 'browse-by-genre-movies', component: BrowseByGenreMovies },
   { path: 'show-genre-movies/:genreId', component: ShowGenreMovies },

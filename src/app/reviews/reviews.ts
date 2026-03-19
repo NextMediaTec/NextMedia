@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
-import { DecimalPipe, NgFor, NgIf } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { FirebaseService } from '../services/firebase.service';
@@ -9,7 +9,7 @@ import { TmdbMediaType } from '../services/tmdb.service';
 @Component({
   selector: 'app-reviews',
   standalone: true,
-  imports: [NgIf, NgFor, FormsModule, DecimalPipe],
+  imports: [NgIf, NgFor, FormsModule],
   templateUrl: './reviews.html',
   styleUrl: './reviews.scss'
 })
