@@ -7,6 +7,10 @@ import { DashboardComponent } from './dashboard/dashboard';
 import { UserProfile } from './user-profile/user-profile';
 import { ShowMovieComponent } from './show-movie/show-movie';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { AdminGuard } from './guards/admin.guard';
+import { Adminpage } from './adminpage/adminpage';
+
+
 import { BrowseByGenreMovies } from './Components/browse-by-genre-movies/browse-by-genre-movies';
 import { BrowseByGenreSeries } from './Components//browse-by-genre-series/browse-by-genre-series';
 import { CelebsBornToday } from './Components//celebs-born-today/celebs-born-today';
@@ -21,6 +25,18 @@ import { Top250Series } from './Components//top250-series/top250-series';
 import { ShowGenreMovies } from './Components/show-genre-movies/show-genre-movies';
 
 export const routes: Route[] = [
+
+    { path: 'show-movie/:mediaType/:id', component: ShowMovieComponent },
+    {path: '', redirectTo: '/login', pathMatch: 'full'},
+    {path: 'register', component: RegisterComponent},
+    {path: 'login', component: LoginComponent},
+    {path: 'home', component: HomeComponent, canActivate: [AuthGuard]},
+    {path: 'dashboard', component: DashboardComponent},
+    {path: 'profile', component: UserProfile, canActivate: [AuthGuard]},
+    {path: 'profile/:uid', component: UserProfile, canActivate: [AuthGuard]},
+    {path: 'forgot-password', component: ForgotPasswordComponent},
+    {path: 'admin', component: Adminpage, canActivate: [AdminGuard]}
+
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
