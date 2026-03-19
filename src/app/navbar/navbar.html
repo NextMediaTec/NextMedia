@@ -1,97 +1,37 @@
 <header class="navbar-shell">
   <div class="navbar-panel outline-box">
     <div class="navbar-left">
-      <a class="brand-link" routerLink="/dashboard">
+      <a class="brand-link" routerLink="/dashboard" (click)="closeBurgerMenu()">
         <span class="brand-icon">🎬</span>
         <span class="brand-text">NextMedia</span>
       </a>
+
+      <button
+        class="burger-button"
+        type="button"
+        (click)="toggleBurgerMenu()"
+        [attr.aria-expanded]="isBurgerMenuOpen"
+        aria-label="Åbn navigation"
+        title="Åbn navigation"
+      >
+        <span class="burger-icon" aria-hidden="true">
+          <span class="burger-line"></span>
+          <span class="burger-line"></span>
+          <span class="burger-line"></span>
+        </span>
+      </button>
     </div>
 
-    <nav class="navbar-center">
-      <a
-        class="nav-link"
-        routerLink="/dashboard"
-        routerLinkActive="active-link"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        Dashboard
-      </a>
-
-      <a
-        class="nav-link"
-        routerLink="/home"
-        routerLinkActive="active-link"
-      >
-        Home
-      </a>
-
-      <a
-        *ngIf="isLoggedIn"
-        class="nav-link"
-        [routerLink]="getProfileRoute()"
-        routerLinkActive="active-link"
-      >
-        Profile
-      </a>
-
-      <a
-        *ngIf="!isLoggedIn"
-        class="nav-link"
-        routerLink="/login"
-        routerLinkActive="active-link"
-      >
-        Login
-      </a>
-
-      <a
-        *ngIf="!isLoggedIn"
-        class="nav-link"
-        routerLink="/register"
-        routerLinkActive="active-link"
-      >
-        Register
-      </a>
-    </nav>
+    <div class="navbar-center">
+      <app-search-engine></app-search-engine>
+    </div>
 
     <div class="navbar-right">
-      <app-search-engine></app-search-engine>
-      
       <a
-      *ngIf="isLoggedIn"
-      class="profile-chip"
-      [routerLink]="getProfileRoute()"
+        class="profile-chip"
+        [routerLink]="getProfileRoute()"
+        (click)="closeBurgerMenu()"
       >
-      <img
-      class="profile-avatar-image"
-      [src]="getAvatarSrcById(loggedInAvatarId)"
-      [alt]="loggedInUsername"
-      />
-      <div class="profile-info">
-        <span class="profile-name">{{ loggedInUsername }}</span>
-        <span class="profile-status">Logget ind</span>
-      </div>  
-    </a>
-    
-
-    <div
-    *ngIf="!isLoggedIn"
-    class="profile-chip"
-    >
-      <img
-      class="profile-avatar-image"
-      [src]="getAvatarSrcById(loggedInAvatarId)"
-      [alt]="loggedInUsername"
-      />
-
-      <div class="profile-info">
-        <span class="profile-name">{{ loggedInUsername }}</span>
-        <span class="profile-status">Ikke logget ind</span>
-      </div>
-
-  </div>
-
-
-      <!-- <a class="profile-chip" [routerLink]="getProfileRoute()">
         <img
           class="profile-avatar-image"
           [src]="getAvatarSrcById(loggedInAvatarId)"
@@ -104,19 +44,40 @@
             {{ isLoggedIn ? 'Logget ind' : 'Ikke logget ind' }}
           </span>
         </div>
-      </a> -->
-      <button
-      *ngIf="isLoggedIn"
-      class="logout-button"
-      type="button"
-      (click)="logout()"
-      aria-label="=Log ud"
-      title="Log ud"
-      >
-      <span class="logout-icon">🚪</span>
-      <span class="logout-text">Log Ud</span>
-    </button>
+      </a>
 
+      <button
+        *ngIf="isLoggedIn"
+        class="logout-button"
+        type="button"
+        (click)="logout()"
+        aria-label="Log ud"
+        title="Log ud"
+      >
+        <span class="logout-icon">🚪</span>
+        <span class="logout-text">Log Ud</span>
+      </button>
+    </div>
+
+    <div *ngIf="isBurgerMenuOpen" class="burger-menu outline-box">
+      <div class="burger-menu-grid">
+        <div class="burger-section" *ngFor="let section of burgerMenuSections">
+          <h3 class="burger-section-title">{{ section.title }}</h3>
+
+          <div class="burger-links">
+            <a
+              *ngFor="let item of section.items"
+              class="burger-link"
+              [routerLink]="item.route"
+              routerLinkActive="active-link"
+              [routerLinkActiveOptions]="{ exact: true }"
+              (click)="closeBurgerMenu()"
+            >
+              <span class="burger-link-label">{{ item.label }}</span>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </header>

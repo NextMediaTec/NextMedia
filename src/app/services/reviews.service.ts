@@ -22,6 +22,12 @@ export interface ReviewItem {
   updatedAt: string;
 }
 
+export interface MediaRatingSummary {
+  mediaId: number;
+  averageRating: number;
+  reviewCount: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -149,6 +155,81 @@ export class ReviewsService {
       createdAt: existingCreatedAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     });
+  }
+
+  public async getAverageRatingsForMediaIds(
+    mediaType: TmdbMediaType,
+    mediaIds: number[]
+  ): Promise<Record<number, MediaRatingSummary>> {
+    const uniqueIds = Array.from(
+      new Set(
+        mediaIds
+          .map((id) => Number(id || 0))
+          .filter((id) => id > 0)
+      )
+    );
+
+    const out: Record<number, MediaRatingSummary> = {};
+
+    for (const mediaId of uniqueIds) {
+      try {
+        const reviewsRef = ref(this.firebase.db, `mediaReviews/${mediaType}/${mediaId}`);
+        const snapshot = await get(reviewsRef);
+
+        if (!snapshot.exists()) {
+          out[mediaId] = {
+            mediaId,
+            averageRating: 0,
+            reviewCount: 0
+          };
+          continue;
+        }
+
+        const raw = snapshot.val();
+        const ratings: number[] = [];
+
+        if (raw && typeof raw === 'object') {
+          for (const key of Object.keys(raw)) {
+            const value = raw[key];
+
+            if (!value) {
+              continue;
+            }
+
+            const numericRating = Number(value.rating || 0);
+
+            if (!Number.isNaN(numericRating)) {
+              ratings.push(Math.max(0, Math.min(5, numericRating)));
+            }
+          }
+        }
+
+        if (ratings.length === 0) {
+          out[mediaId] = {
+            mediaId,
+            averageRating: 0,
+            reviewCount: 0
+          };
+          continue;
+        }
+
+        const total = ratings.reduce((sum, current) => sum + current, 0);
+
+        out[mediaId] = {
+          mediaId,
+          averageRating: total / ratings.length,
+          reviewCount: ratings.length
+        };
+      } catch (error) {
+        out[mediaId] = {
+          mediaId,
+          averageRating: 0,
+          reviewCount: 0
+        };
+      }
+    }
+
+    return out;
   }
 
   private async getUsernameForCurrentUser(): Promise<string> {

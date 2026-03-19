@@ -1,0 +1,127 @@
+<section class="show-genre-page">
+  <div class="status-row" *ngIf="isLoading">
+    <p>Henter genre-film...</p>
+  </div>
+
+  <div class="status-row error" *ngIf="hasError">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <ng-container *ngIf="!isLoading && !hasError">
+    <section class="genre-hero" *ngIf="heroMovie">
+      <div class="genre-hero-image">
+        <img
+          [src]="getHeroImage()"
+          [alt]="genreName"
+        />
+      </div>
+
+      <div class="genre-hero-content">
+        <a class="back-link" routerLink="/browse-by-genre-movies">← All interests</a>
+        <h1>{{ genreName }}</h1>
+        <p>
+          Film i denne genre er samlet i tre sektioner:
+          populære film, seneste udgivelser og bedst ratede film ud fra jeres eget reviewsystem.
+        </p>
+
+        <div class="genre-stats">
+          <span>{{ popularMovies.length }} populære</span>
+          <span>{{ latestMovies.length }} seneste</span>
+          <span>{{ customTopRatedMovies.length }} bruger-ratede</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="genre-section">
+      <div class="section-header">
+        <h2>Popular movies</h2>
+        <p>De 25 mest populære film i {{ genreName }}</p>
+      </div>
+
+      <div class="movie-grid">
+        <a
+          class="movie-card"
+          *ngFor="let movie of popularMovies; trackBy: trackByMovieId"
+          [routerLink]="['/show-movie', 'movie', movie.id]"
+        >
+          <div class="movie-poster">
+            <img
+              *ngIf="movie.poster_path"
+              [src]="getPosterUrl(movie.poster_path)"
+              [alt]="getDisplayTitle(movie)"
+            />
+          </div>
+
+          <div class="movie-card-content">
+            <h3>{{ getDisplayTitle(movie) }}</h3>
+            <p *ngIf="getDisplayYear(movie)">{{ getDisplayYear(movie) }}</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="genre-section">
+      <div class="section-header">
+        <h2>Latest movies</h2>
+        <p>De 25 seneste film i {{ genreName }}</p>
+      </div>
+
+      <div class="movie-grid">
+        <a
+          class="movie-card"
+          *ngFor="let movie of latestMovies; trackBy: trackByMovieId"
+          [routerLink]="['/show-movie', 'movie', movie.id]"
+        >
+          <div class="movie-poster">
+            <img
+              *ngIf="movie.poster_path"
+              [src]="getPosterUrl(movie.poster_path)"
+              [alt]="getDisplayTitle(movie)"
+            />
+          </div>
+
+          <div class="movie-card-content">
+            <h3>{{ getDisplayTitle(movie) }}</h3>
+            <p *ngIf="getDisplayYear(movie)">{{ getDisplayYear(movie) }}</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="genre-section">
+      <div class="section-header">
+        <h2>Top rated by our users</h2>
+        <p>Bedst ratede film i {{ genreName }} ud fra jeres eget reviewsystem</p>
+      </div>
+
+      <div class="movie-grid" *ngIf="customTopRatedMovies.length > 0; else noCustomRatedMovies">
+        <a
+          class="movie-card"
+          *ngFor="let movie of customTopRatedMovies; trackBy: trackByMovieId"
+          [routerLink]="['/show-movie', 'movie', movie.id]"
+        >
+          <div class="movie-poster">
+            <img
+              *ngIf="movie.poster_path"
+              [src]="getPosterUrl(movie.poster_path)"
+              [alt]="getDisplayTitle(movie)"
+            />
+          </div>
+
+          <div class="movie-card-content">
+            <h3>{{ getDisplayTitle(movie) }}</h3>
+            <p *ngIf="getDisplayYear(movie)">{{ getDisplayYear(movie) }}</p>
+            <p>Vores rating: {{ formatOwnRating(movie.ownAverageRating) }}/5</p>
+            <p>Reviews: {{ movie.ownRatingCount }}</p>
+          </div>
+        </a>
+      </div>
+
+      <ng-template #noCustomRatedMovies>
+        <div class="empty-section">
+          <p>Der er endnu ikke nok bruger-reviews i denne genre.</p>
+        </div>
+      </ng-template>
+    </section>
+  </ng-container>
+</section>

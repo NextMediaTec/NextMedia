@@ -1,27 +1,41 @@
 .navbar-shell {
   position: relative;
   box-sizing: border-box;
+  overflow: visible;
+  z-index: 2000;
 }
 
 .outline-box {
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 .navbar-panel {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 25;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-  color: var(--app-fg);
+  position: relative;
+  background: rgba(18, 18, 22, 0.92);
+  border-radius: 0;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+  color: #ffffff;
   display: grid;
-  grid-template-columns: 220px 1fr auto;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
+  gap: 16px;
   box-sizing: border-box;
+  padding: 12px 16px;
+  overflow: visible;
+  z-index: 2001;
 }
 
 .navbar-panel a {
   color: inherit;
 }
 
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
 
 .brand-link {
   display: inline-flex;
@@ -30,6 +44,7 @@
   text-decoration: none;
   color: inherit;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .brand-icon {
@@ -45,6 +60,18 @@
   letter-spacing: 0.2px;
 }
 
+.navbar-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.navbar-center app-search-engine {
+  width: 100%;
+  max-width: 640px;
+  display: block;
+}
 
 .nav-link {
   display: inline-flex;
@@ -52,30 +79,31 @@
   justify-content: center;
   min-height: 40px;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 12px;
   color: inherit;
-  background: transparent;
-  border: 1px solid transparent;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
   text-decoration: none;
   font-size: 1rem;
 }
 
 .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
 }
 
 .active-link {
-  background-color: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(86, 102, 188, 0.24);
+  border-color: rgba(120, 139, 255, 0.6);
 }
 
 .navbar-right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 14px;
   min-width: 0;
 }
 
@@ -85,17 +113,18 @@
   gap: 10px;
   text-decoration: none;
   color: inherit;
-  border-radius: 10px;
+  border-radius: 14px;
   padding: 8px 10px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgb(26, 26, 32);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   min-width: 0;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
 }
 
 .profile-chip:hover {
-  background-color: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.22);
+  background: rgb(34, 34, 42);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
 }
 
 .profile-avatar-image {
@@ -123,10 +152,186 @@
 
 .profile-status {
   font-size: 0.9rem;
-  opacity: 0.85;
+  opacity: 0.74;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.logout-button {
+  min-height: 46px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgb(26, 26, 32);
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.logout-button:hover {
+  background: rgb(34, 34, 42);
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.logout-button:active {
+  transform: scale(0.98);
+}
+
+.logout-button:focus-visible {
+  outline: 2px solid rgba(120, 139, 255, 0.6);
+  outline-offset: 2px;
+}
+
+.logout-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.logout-text {
+  white-space: nowrap;
+}
+
+.burger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  color: inherit;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.burger-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.burger-button:focus-visible {
+  outline: 2px solid rgba(120, 139, 255, 0.6);
+  outline-offset: 2px;
+}
+
+.burger-icon {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.burger-line {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: currentColor;
+  line-height: 1;
+}
+
+
+.burger-menu {
+  position: absolute;
+  top: 100%;
+  left: -1px;
+  right: -1px;
+  z-index: 3000;
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  background: rgba(18, 18, 22, 0.92);
+  color: #ffffff;
+  border-radius: 0;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-top: 0;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+  box-sizing: border-box;
+  padding: 24px 20px;
+}
+
+.burger-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 280px));
+  justify-content: center;
+  align-items: start;
+  gap: 24px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.burger-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  align-items: stretch;
+}
+
+.burger-section-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.56);
+  text-align: center;
+}
+
+.burger-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.burger-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+  text-decoration: none;
+  font-size: 1rem;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.burger-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.burger-link.active-link {
+  background: rgba(86, 102, 188, 0.24);
+  border-color: rgba(120, 139, 255, 0.6);
+}
+
+.burger-link-label {
+  display: block;
+  color: inherit;
+  font-weight: 700;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.burger-link-path {
+  display: none;
 }
 
 @media (max-width: 1100px) {
@@ -136,7 +341,7 @@
   }
 
   .navbar-left {
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   .navbar-center {
@@ -144,8 +349,13 @@
   }
 
   .navbar-right {
-    justify-content: center;
+    justify-content: flex-end;
     flex-wrap: wrap;
+  }
+
+  .burger-menu-grid {
+    grid-template-columns: repeat(2, minmax(220px, 280px));
+    justify-content: center;
   }
 }
 
@@ -159,10 +369,11 @@
   }
 
   .navbar-center {
-    gap: 8px;
+    width: 100%;
   }
 
-  .nav-link {
+  .navbar-center app-search-engine {
+    max-width: none;
     width: 100%;
   }
 
@@ -170,38 +381,9 @@
     width: 100%;
     justify-content: center;
   }
-}
-.logout-button {
-  padding: 10px 18px;
-  border: 1px solid #cfcfcf;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #ffffff, #f1f1f1);
-  color: #1f1f1f;
-  cursor: pointer;
-  font-weight: 700;
-  transition: all 0.2s ease;
-}
-.logout-button:hover {
-  background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-.logout-button:active {
-  transform: scale(0.98);
-}
-.logout-button:focus-visible {
 
-  outline: 2px solid #222;
-  outline-offset: 2px;
-}
-.logout-icon {
-  font-size: 16px;
-  line-height: 1;
-}
-.logout-text {
-  white-space: nowrap;
-}
-.navbar-right {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+  .burger-menu-grid {
+    grid-template-columns: minmax(220px, 420px);
+    justify-content: center;
+  }
 }

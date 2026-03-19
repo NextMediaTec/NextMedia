@@ -39,6 +39,21 @@ export interface TmdbGenre {
   name: string;
 }
 
+export interface TmdbMovieGenresResponse {
+  genres: TmdbGenre[];
+}
+
+export interface TmdbDiscoverMovieOptions {
+  page?: number;
+  withGenres?: string;
+  language?: string;
+  sortBy?: string;
+  releaseDateLte?: string;
+  releaseDateGte?: string;
+  voteCountGte?: number;
+  region?: string;
+}
+
 export interface TmdbProductionCompany {
   id: number;
   logo_path: string | null;
@@ -253,6 +268,30 @@ export interface TmdbCertificationDisplayItem {
   rating: string;
 }
 
+export interface TmdbDiscoverMovieResult {
+  adult?: boolean;
+  backdrop_path: string | null;
+  genre_ids?: number[];
+  id: number;
+  original_language?: string;
+  original_title?: string;
+  overview: string;
+  popularity?: number;
+  poster_path: string | null;
+  release_date?: string;
+  title?: string;
+  video?: boolean;
+  vote_average?: number;
+  vote_count?: number;
+}
+
+export interface TmdbDiscoverMovieResponse {
+  page: number;
+  results: TmdbDiscoverMovieResult[];
+  total_pages: number;
+  total_results: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -321,6 +360,74 @@ export class TmdbService {
 
     return this.http.get<BackendTmdbResponse<TmdbMovieReleaseDatesResponse | TmdbTvContentRatingsResponse>>(
       `${this.backendBaseUrl}/certificates/${mediaType}/${id}`,
+      { params }
+    );
+  }
+
+  public getMovieGenres(
+    language: string = 'en-US'
+  ): Observable<BackendTmdbResponse<TmdbMovieGenresResponse>> {
+    let params = new HttpParams();
+    params = params.set('language', language);
+
+    return this.http.get<BackendTmdbResponse<TmdbMovieGenresResponse>>(
+      `${this.backendBaseUrl}/genre/movie/list`,
+      { params }
+    );
+  }
+
+  public discoverMovies(
+    page: number = 1,
+    withGenres: string = '',
+    language: string = 'en-US',
+    sortBy: string = 'original_title.asc'
+  ): Observable<BackendTmdbResponse<TmdbSearchMultiResponse>> {
+    let params = new HttpParams();
+    params = params.set('page', String(page));
+    params = params.set('language', language);
+    params = params.set('sort_by', sortBy);
+
+    if (withGenres.trim().length > 0) {
+      params = params.set('with_genres', withGenres);
+    }
+
+    return this.http.get<BackendTmdbResponse<TmdbSearchMultiResponse>>(
+      `${this.backendBaseUrl}/discover/movie`,
+      { params }
+    );
+  }
+
+  public discoverMoviesAdvanced(
+    options: TmdbDiscoverMovieOptions
+  ): Observable<BackendTmdbResponse<TmdbSearchMultiResponse>> {
+    let params = new HttpParams();
+
+    params = params.set('page', String(options.page ?? 1));
+    params = params.set('language', options.language ?? 'en-US');
+    params = params.set('sort_by', options.sortBy ?? 'popularity.desc');
+
+    if (String(options.withGenres || '').trim().length > 0) {
+      params = params.set('with_genres', String(options.withGenres).trim());
+    }
+
+    if (String(options.releaseDateLte || '').trim().length > 0) {
+      params = params.set('release_date.lte', String(options.releaseDateLte).trim());
+    }
+
+    if (String(options.releaseDateGte || '').trim().length > 0) {
+      params = params.set('release_date.gte', String(options.releaseDateGte).trim());
+    }
+
+    if (typeof options.voteCountGte === 'number' && !Number.isNaN(options.voteCountGte)) {
+      params = params.set('vote_count.gte', String(options.voteCountGte));
+    }
+
+    if (String(options.region || '').trim().length > 0) {
+      params = params.set('region', String(options.region).trim());
+    }
+
+    return this.http.get<BackendTmdbResponse<TmdbSearchMultiResponse>>(
+      `${this.backendBaseUrl}/discover/movie`,
       { params }
     );
   }
