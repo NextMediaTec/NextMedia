@@ -1,0 +1,149 @@
+<div class="admin-dashboard-container">
+    <div class="admin-dashboard-header">
+        <div>
+            <h1>Admin Dashboard</h1>
+            <p>Manage users, roles and permissions</p>
+        </div>
+
+    <div class="search-bar-container">
+        <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInput()"
+            placeholder="Search by username or email"
+        />
+    </div>
+    </div>
+
+    <p *ngIf="isLoading" class="status-message">Loading users... </p>
+    <p *ngIf="errorMessage" class="error-message">{{errorMessage}}</p>
+    <p *ngIf="succesMessage" class="succes-message">{{succesMessage}}</p>
+
+    <div *ngIf="!isLoading" class="tables-container">
+        <section class="user-table">
+            <h2>Admins</h2>
+
+            <table *ngIf="admins.length > 0; else noAdmins">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Created</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr *ngFor="let user of admins">
+                        <td>{{user.username}}</td>
+                        <td>{{user.email}}</td>
+                        <td>{{formatCreatedAt(user.createdAt) }}</td>
+                        <td>
+                            <select [value]="user.role" (change)="onRoleChange(user, $event)">
+                                <option value="user">User</option>
+                                <option value="moderator">Moderator</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="delete-button" type="button" (click)="deleteUser(user)">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <ng-template #noAdmins>
+                <p class="empty-message">No Admins found.</p>
+            </ng-template>
+        </section>
+
+        <section class="user-table">
+            <h2>Moderators</h2>
+
+            <table *ngIf="moderators.length > 0; else noModerators">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Created</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr *ngFor="let user of moderators">
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ formatCreatedAt(user.createdAt) }}</td>
+                        <td>
+                            <select [value]="user.role" (change)="onRoleChange(user, $event)">
+                                <option value="user">User</option>
+                                <option value="moderator">Moderator</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="delete-button" type="button" (click)="deleteUser(user)">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <ng-template #noModerators>
+                <p class="empty-message">No moderators found</p>
+            </ng-template>
+        </section>
+
+        
+                <section class="user-table">
+            <h2>Users</h2>
+
+            <table *ngIf="regularUsers.length > 0; else noUsers">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Created</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr *ngFor="let user of regularUsers">
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ formatCreatedAt(user.createdAt) }}</td>
+                        <td>
+                            <select [value]="user.role" (change)="onRoleChange(user, $event)">
+                                <option value="user">User</option>
+                                <option value="moderator">Moderator</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="delete-button" type="button" (click)="deleteUser(user)">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <ng-template #noUsers>
+                <p class="empty-message">No regular users found</p>
+            </ng-template>
+        </section>
+
+
+
+
+    </div>
+
+</div>
