@@ -11,113 +11,313 @@
     <div
       class="hero-backdrop"
       *ngIf="getBackdropUrl()"
-      [style.background-image]="'linear-gradient(rgba(10, 10, 10, 0.72), rgba(10, 10, 10, 0.94)), url(' + getBackdropUrl() + ')'"
+      [style.background-image]="'linear-gradient(rgba(7, 7, 7, 0.84), rgba(7, 7, 7, 0.98)), url(' + getBackdropUrl() + ')'"
     ></div>
 
     <div class="hero-content">
-      <div class="poster-column">
+      <div class="hero-poster-panel">
         <img
           class="poster-image"
           *ngIf="getPosterUrl()"
           [src]="getPosterUrl()"
           [alt]="getTitle()"
         />
-      </div>
 
-      <div class="info-column">
-        <div class="media-type-badge">
-          {{ mediaType === 'movie' ? 'Film' : 'Serie' }}
+        <div class="empty-visual-box" *ngIf="!getPosterUrl()"></div>
+
+        <div class="hero-poster-info-block">
+          <div class="media-type-badge">
+            {{ mediaType === 'movie' ? 'Film' : 'Serie' }}
+          </div>
+
+          <h1 class="title">
+            {{ getTitle() }}
+          </h1>
+
+          <div class="tagline" *ngIf="details.tagline">
+            {{ details.tagline }}
+          </div>
+
+          <div class="meta-line">
+            <span *ngIf="getDate()">{{ getDate() }}</span>
+            <span *ngIf="getRuntimeText()">• {{ getRuntimeText() }}</span>
+            <span *ngIf="details.vote_average">• TMDb {{ details.vote_average | number:'1.1-1' }}/10</span>
+          </div>
+
+          <div class="genres">
+            {{ getGenresText() }}
+          </div>
+
+          <div class="hero-series-meta" *ngIf="isTv()">
+            <div class="hero-series-meta-item">
+              <div class="hero-series-meta-label">Seasons</div>
+              <div class="hero-series-meta-value" *ngIf="details.number_of_seasons">{{ details.number_of_seasons }}</div>
+              <div class="hero-series-meta-value" *ngIf="!details.number_of_seasons">-</div>
+            </div>
+
+            <div class="hero-series-meta-item">
+              <div class="hero-series-meta-label">Episodes</div>
+              <div class="hero-series-meta-value" *ngIf="details.number_of_episodes">{{ details.number_of_episodes }}</div>
+              <div class="hero-series-meta-value" *ngIf="!details.number_of_episodes">-</div>
+            </div>
+          </div>
+
+          <div class="hero-info-mini-grid">
+            <div class="detail-card">
+              <div class="detail-label">Status</div>
+              <div class="detail-value" *ngIf="details.status">{{ details.status }}</div>
+              <div class="empty-box" *ngIf="!details.status"></div>
+            </div>
+
+            <div class="detail-card">
+              <div class="detail-label">Certificates</div>
+              <div class="detail-value detail-text" *ngIf="getCertificateText()">{{ getCertificateText() }}</div>
+              <div class="empty-box" *ngIf="!getCertificateText() && !certificateLoading"></div>
+            </div>
+
+            <div class="detail-card">
+              <div class="detail-label">Original language</div>
+              <div class="detail-value" *ngIf="details.original_language">{{ details.original_language }}</div>
+              <div class="empty-box" *ngIf="!details.original_language"></div>
+            </div>
+
+            <div class="detail-card" *ngIf="!isTv()">
+              <div class="detail-label">Budget</div>
+              <div class="detail-value" *ngIf="details.budget">{{ details.budget | number }}</div>
+              <div class="empty-box" *ngIf="!details.budget"></div>
+            </div>
+
+            <div class="detail-card" *ngIf="!isTv()">
+              <div class="detail-label">Revenue</div>
+              <div class="detail-value" *ngIf="details.revenue">{{ details.revenue | number }}</div>
+              <div class="empty-box" *ngIf="!details.revenue"></div>
+            </div>
+          </div>
         </div>
 
-        <h1 class="title">
-          {{ getTitle() }}
-        </h1>
-
-        <div class="tagline" *ngIf="details.tagline">
-          {{ details.tagline }}
-        </div>
-
-        <div class="meta-line">
-          <span *ngIf="getDate()">{{ getDate() }}</span>
-          <span *ngIf="getRuntimeText()">• {{ getRuntimeText() }}</span>
-          <span *ngIf="details.vote_average">• {{ details.vote_average | number:'1.1-1' }}/10</span>
-        </div>
-
-        <div class="genres" *ngIf="getGenresText()">
-          {{ getGenresText() }}
-        </div>
-
-        <div class="watchlist-actions">
+        <div class="primary-actions">
           <button
             type="button"
-            class="watchlist-button"
-            [class.in-watchlist]="isInWatchlist"
+            class="action-button"
+            [class.active]="isInWatchlist"
             [disabled]="watchlistLoading"
             (click)="toggleWatchlist()"
           >
-            <span *ngIf="!watchlistLoading && !isInWatchlist">
-              Tilføj til watchlist
-            </span>
-
-            <span *ngIf="!watchlistLoading && isInWatchlist">
-              Fjern fra watchlist
-            </span>
-
-            <span *ngIf="watchlistLoading">
-              Opdaterer...
-            </span>
+            <span *ngIf="!watchlistLoading && !isInWatchlist">Tilføj til watchlist</span>
+            <span *ngIf="!watchlistLoading && isInWatchlist">Fjern fra watchlist</span>
+            <span *ngIf="watchlistLoading">Opdaterer...</span>
           </button>
 
-          <div class="watchlist-message" *ngIf="watchlistMessage">
-            {{ watchlistMessage }}
-          </div>
+          <button
+            type="button"
+            class="action-button"
+            [class.active]="isMarkedAsSeen"
+            [disabled]="seenLoading"
+            (click)="toggleSeen()"
+          >
+            <span *ngIf="!seenLoading && !isMarkedAsSeen">Marker som set</span>
+            <span *ngIf="!seenLoading && isMarkedAsSeen">Fjern set-markering</span>
+            <span *ngIf="seenLoading">Opdaterer...</span>
+          </button>
         </div>
 
-        <div class="overview-block" *ngIf="details.overview">
-          <div class="section-heading">Overview</div>
-          <p class="overview-text">{{ details.overview }}</p>
+        <div class="action-message" *ngIf="watchlistMessage">
+          {{ watchlistMessage }}
         </div>
 
-        <div class="facts-grid">
-          <div class="fact-card" *ngIf="details.status">
-            <div class="fact-label">Status</div>
-            <div class="fact-value">{{ details.status }}</div>
+        <div class="action-message" *ngIf="seenMessage">
+          {{ seenMessage }}
+        </div>
+      </div>
+
+      <div class="hero-info-panel">
+        <div class="hero-trailers-block">
+          <div class="detail-label">Trailers</div>
+
+          <div class="section-slider-shell" *ngIf="getTrailers().length > 0">
+            <button
+              type="button"
+              class="slider-nav slider-nav-left"
+              (click)="scrollGallery(trailerSlider, -1)"
+              aria-label="Forrige trailers"
+            >
+              ‹
+            </button>
+
+            <div class="slider-track trailers-slider" #trailerSlider>
+              <div class="slider-item trailer-slide-item" *ngFor="let trailer of getTrailers()">
+                <div class="trailer-card">
+                  <div class="trailer-frame">
+                    <iframe
+                      [src]="getTrailerEmbedUrl(trailer)"
+                      [title]="trailer.name"
+                      loading="lazy"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen
+                    ></iframe>
+                  </div>
+
+                  <div class="trailer-name">{{ trailer.name }}</div>
+                  <div class="trailer-type">{{ trailer.type }}</div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="slider-nav slider-nav-right"
+              (click)="scrollGallery(trailerSlider, 1)"
+              aria-label="Næste trailers"
+            >
+              ›
+            </button>
           </div>
 
-          <div class="fact-card" *ngIf="details.original_language">
-            <div class="fact-label">Original language</div>
-            <div class="fact-value">{{ details.original_language }}</div>
+          <div class="empty-box" *ngIf="getTrailers().length === 0"></div>
+        </div>
+
+        <div class="hero-top-grid">
+          <div class="detail-card">
+            <div class="detail-label">Overview</div>
+            <div class="detail-value detail-text" *ngIf="details.overview">{{ details.overview }}</div>
+            <div class="empty-box" *ngIf="!details.overview"></div>
           </div>
 
-          <div class="fact-card" *ngIf="details.number_of_seasons">
-            <div class="fact-label">Seasons</div>
-            <div class="fact-value">{{ details.number_of_seasons }}</div>
-          </div>
+          <div class="detail-card detail-card-wide">
+            <div class="detail-label">Streamingtjenester</div>
 
-          <div class="fact-card" *ngIf="details.number_of_episodes">
-            <div class="fact-label">Episodes</div>
-            <div class="fact-value">{{ details.number_of_episodes }}</div>
-          </div>
+            <div class="providers-grid" *ngIf="hasProvidersData()">
+              <div class="provider-chip" *ngFor="let provider of getAllUniqueStreamingProviders()">
+                <img
+                  class="provider-logo"
+                  *ngIf="getProviderLogo(provider.logo_path)"
+                  [src]="getProviderLogo(provider.logo_path)"
+                  [alt]="provider.provider_name"
+                />
+                <div class="provider-name">{{ provider.provider_name }}</div>
+              </div>
+            </div>
 
-          <div class="fact-card" *ngIf="details.budget">
-            <div class="fact-label">Budget</div>
-            <div class="fact-value">{{ details.budget | number }}</div>
-          </div>
-
-          <div class="fact-card" *ngIf="details.revenue">
-            <div class="fact-label">Revenue</div>
-            <div class="fact-value">{{ details.revenue | number }}</div>
+            <div class="empty-box" *ngIf="!hasProvidersData() && !providersLoading"></div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="content-sections">
-      <div class="section-block" *ngIf="getTopCast().length > 0">
-        <h2 class="section-title">Cast</h2>
+      <div class="section-block">
+        <h2 class="section-title">Images</h2>
 
-        <div class="cast-grid">
-          <div class="cast-card" *ngFor="let actor of getTopCast()">
+        <div class="section-slider-shell" *ngIf="getAllImages().length > 5">
+          <button
+            type="button"
+            class="slider-nav slider-nav-left"
+            (click)="scrollGallery(imageSlider, -1)"
+            aria-label="Forrige billeder"
+          >
+            ‹
+          </button>
+
+          <div class="slider-track images-slider" #imageSlider>
+            <div class="slider-item image-slide-item" *ngFor="let image of getAllImages()">
+              <div class="image-card">
+                <img
+                  class="gallery-image"
+                  [src]="getImageUrl(image.file_path, 'w780')"
+                  alt="Media image"
+                />
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="slider-nav slider-nav-right"
+            (click)="scrollGallery(imageSlider, 1)"
+            aria-label="Næste billeder"
+          >
+            ›
+          </button>
+        </div>
+
+        <div class="images-grid" *ngIf="getAllImages().length > 0 && getAllImages().length <= 5">
+          <div class="image-card" *ngFor="let image of getAllImages()">
+            <img
+              class="gallery-image"
+              [src]="getImageUrl(image.file_path, 'w780')"
+              alt="Media image"
+            />
+          </div>
+        </div>
+
+        <div class="empty-box section-empty" *ngIf="getAllImages().length === 0"></div>
+      </div>
+
+      <div class="section-block">
+        <h2 class="section-title">Directors</h2>
+
+        <div class="people-grid" *ngIf="getDirectors().length > 0">
+          <div class="person-card" *ngFor="let person of getDirectors()">
+            <img
+              class="person-image"
+              *ngIf="getCastProfile(person.profile_path)"
+              [src]="getCastProfile(person.profile_path)"
+              [alt]="person.name"
+            />
+
+            <div class="person-name">{{ person.name }}</div>
+            <div class="person-role">{{ person.job }}</div>
+          </div>
+        </div>
+
+        <div class="empty-box section-empty" *ngIf="getDirectors().length === 0"></div>
+      </div>
+
+      <div class="section-block">
+        <h2 class="section-title">Producers</h2>
+
+        <div class="people-grid" *ngIf="getProducers().length > 0">
+          <div class="person-card" *ngFor="let person of getProducers()">
+            <img
+              class="person-image"
+              *ngIf="getCastProfile(person.profile_path)"
+              [src]="getCastProfile(person.profile_path)"
+              [alt]="person.name"
+            />
+
+            <div class="person-name">{{ person.name }}</div>
+            <div class="person-role">{{ person.job }}</div>
+          </div>
+        </div>
+
+        <div class="empty-box section-empty" *ngIf="getProducers().length === 0"></div>
+      </div>
+
+      <div class="section-block">
+        <h2 class="section-title">Writers</h2>
+
+        <div class="people-grid" *ngIf="getWriters().length > 0">
+          <div class="person-card" *ngFor="let person of getWriters()">
+            <img
+              class="person-image"
+              *ngIf="getCastProfile(person.profile_path)"
+              [src]="getCastProfile(person.profile_path)"
+              [alt]="person.name"
+            />
+
+            <div class="person-name">{{ person.name }}</div>
+            <div class="person-role">{{ person.job }}</div>
+          </div>
+        </div>
+
+        <div class="empty-box section-empty" *ngIf="getWriters().length === 0"></div>
+      </div>
+
+      <div class="section-block">
+        <h2 class="section-title">Full cast</h2>
+
+        <div class="cast-grid" *ngIf="getAllCast().length > 0">
+          <div class="cast-card" *ngFor="let actor of getAllCast()">
             <img
               class="cast-image"
               *ngIf="getCastProfile(actor.profile_path)"
@@ -129,12 +329,14 @@
             <div class="cast-character" *ngIf="actor.character">{{ actor.character }}</div>
           </div>
         </div>
+
+        <div class="empty-box section-empty" *ngIf="getAllCast().length === 0"></div>
       </div>
 
-      <div class="section-block" *ngIf="getRecommendations().length > 0">
-        <h2 class="section-title">Recommendations</h2>
+      <div class="section-block">
+        <h2 class="section-title">Lignende titler</h2>
 
-        <div class="recommendations-grid">
+        <div class="recommendations-grid" *ngIf="getRecommendations().length > 0">
           <a
             class="recommendation-card"
             *ngFor="let item of getRecommendations()"
@@ -156,7 +358,15 @@
             </div>
           </a>
         </div>
+
+        <div class="empty-box section-empty" *ngIf="getRecommendations().length === 0"></div>
       </div>
+
+      <app-reviews
+        [mediaType]="mediaType"
+        [mediaId]="mediaId"
+        [mediaTitle]="getTitle()"
+      ></app-reviews>
     </div>
   </div>
 </div>

@@ -122,6 +122,7 @@ app.get('/api/tmdb/details/:mediaType/:id', async (req, res) => {
         message: 'Id mangler.'
       });
     }
+
     const url = new URL(`${TMDB_BASE_URL}/${mediaType}/${id}`);
     url.searchParams.set('language', language);
     url.searchParams.set('append_to_response', 'credits,videos,images,recommendations');
@@ -145,6 +146,105 @@ app.get('/api/tmdb/details/:mediaType/:id', async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Serverfejl under hentning af detaljer.',
+      error: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+app.get('/api/tmdb/watch-providers/:mediaType/:id', async (req, res) => {
+  try {
+    const mediaType = String(req.params.mediaType || '').trim();
+    const id = String(req.params.id || '').trim();
+    const language = String(req.query.language || 'en-US');
+
+    if (mediaType !== 'movie' && mediaType !== 'tv') {
+      return res.status(400).json({
+        success: false,
+        message: 'mediaType skal være "movie" eller "tv".'
+      });
+    }
+
+    if (id.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Id mangler.'
+      });
+    }
+
+    const url = new URL(`${TMDB_BASE_URL}/${mediaType}/${id}/watch/providers`);
+    url.searchParams.set('language', language);
+
+    const result = await tmdbFetch(url);
+
+    if (!result.ok) {
+      return res.status(result.status).json({
+        success: false,
+        message: 'TMDb returnerede en fejl under hentning af streamingtjenester.',
+        tmdb: result.data
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: result.data
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Serverfejl under hentning af streamingtjenester.',
+      error: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+app.get('/api/tmdb/certificates/:mediaType/:id', async (req, res) => {
+  try {
+    const mediaType = String(req.params.mediaType || '').trim();
+    const id = String(req.params.id || '').trim();
+    const language = String(req.query.language || 'en-US');
+
+    if (mediaType !== 'movie' && mediaType !== 'tv') {
+      return res.status(400).json({
+        success: false,
+        message: 'mediaType skal være "movie" eller "tv".'
+      });
+    }
+
+    if (id.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Id mangler.'
+      });
+    }
+
+    let url = null;
+
+    if (mediaType === 'movie') {
+      url = new URL(`${TMDB_BASE_URL}/movie/${id}/release_dates`);
+      url.searchParams.set('language', language);
+    } else {
+      url = new URL(`${TMDB_BASE_URL}/tv/${id}/content_ratings`);
+      url.searchParams.set('language', language);
+    }
+
+    const result = await tmdbFetch(url);
+
+    if (!result.ok) {
+      return res.status(result.status).json({
+        success: false,
+        message: 'TMDb returnerede en fejl under hentning af certificates.',
+        tmdb: result.data
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: result.data
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Serverfejl under hentning af certificates.',
       error: error instanceof Error ? error.message : String(error)
     });
   }

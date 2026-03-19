@@ -657,6 +657,63 @@ button:focus {
   background: rgba(0, 200, 120, 0.24);
 }
 
+/* ---------------- Watchlist cards ---------------- */
+.watchlist-two-col {
+  align-items: start;
+}
+
+.watchlist-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.watchlist-card {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.watchlist-poster-wrap {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.watchlist-poster {
+  width: 92px;
+  height: 138px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.watchlist-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.watchlist-title {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.watchlist-sub {
+  opacity: 0.88;
+  font-size: 0.92rem;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
 @media (max-width: 900px) {
   .dashboard-container {
     grid-template-columns: 1fr;
@@ -708,5 +765,13 @@ button:focus {
 
   .badge {
     margin-left: 0;
+  }
+
+  .watchlist-card {
+    grid-template-columns: 1fr;
+  }
+
+  .watchlist-poster-wrap {
+    justify-content: flex-start;
   }
 }

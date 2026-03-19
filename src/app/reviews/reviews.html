@@ -1,0 +1,82 @@
+<div class="reviews-section">
+  <div class="reviews-header">
+    <div>
+      <h2 class="reviews-title">Reviews</h2>
+      <div class="reviews-subtitle" *ngIf="mediaTitle">{{ mediaTitle }}</div>
+    </div>
+
+    <div class="rating-summary-card">
+      <div class="rating-summary-label">Gennemsnitlig rating</div>
+      <div class="rating-summary-value">{{ formatRating(averageRating) }}/5</div>
+      <div class="rating-summary-count">{{ reviewCount }} reviews</div>
+    </div>
+  </div>
+
+  <div class="review-create-card">
+    <div class="review-create-title">Tilføj review</div>
+
+    <div class="login-warning" *ngIf="!isLoggedIn">
+      Du skal være logget ind for at lave en review eller rating.
+    </div>
+
+    <div class="rating-picker">
+      <button
+        type="button"
+        class="star-button"
+        *ngFor="let star of getStarsArray()"
+        [class.active]="isStarActive(star)"
+        [disabled]="!isLoggedIn || submitLoading"
+        (click)="setRating(star)"
+      >
+        ★
+      </button>
+    </div>
+
+    <textarea
+      class="review-textarea"
+      [(ngModel)]="reviewText"
+      [disabled]="!isLoggedIn || submitLoading"
+      placeholder="Skriv din review her"
+      rows="5"
+    ></textarea>
+
+    <button
+      type="button"
+      class="submit-review-button"
+      [disabled]="!isLoggedIn || submitLoading"
+      (click)="submitReview()"
+    >
+      <span *ngIf="!submitLoading">Gem review</span>
+      <span *ngIf="submitLoading">Gemmer...</span>
+    </button>
+
+    <div class="review-message" *ngIf="message">
+      {{ message }}
+    </div>
+  </div>
+
+  <div class="reviews-list-card">
+    <div class="review-list-title">Alle reviews</div>
+
+    <div class="review-list" *ngIf="reviews.length > 0">
+      <div class="review-item" *ngFor="let review of reviews">
+        <div class="review-top-line">
+          <div class="review-username">{{ review.username }}</div>
+          <div class="review-rating">{{ formatRating(review.rating) }}/5</div>
+        </div>
+
+        <div class="review-date">{{ review.updatedAt }}</div>
+
+        <div class="review-text" *ngIf="review.reviewText">
+          {{ review.reviewText }}
+        </div>
+
+        <div class="review-empty-text" *ngIf="!review.reviewText">
+          Ingen tekst tilføjet.
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-reviews-box" *ngIf="reviews.length === 0"></div>
+  </div>
+</div>
