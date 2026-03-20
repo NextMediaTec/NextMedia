@@ -1,127 +1,330 @@
 <section class="show-genre-page">
-  <div class="status-row" *ngIf="isLoading">
-    <p>Henter genre-film...</p>
-  </div>
+  <div class="genre-page-shell">
+    <div class="status-row" *ngIf="isLoading">
+      <p>Henter genre-film...</p>
+    </div>
 
-  <div class="status-row error" *ngIf="hasError">
-    <p>{{ errorMessage }}</p>
-  </div>
+    <div class="status-row error" *ngIf="hasError">
+      <p>{{ errorMessage }}</p>
+    </div>
 
-  <ng-container *ngIf="!isLoading && !hasError">
-    <section class="genre-hero" *ngIf="heroMovie">
-      <div class="genre-hero-image">
-        <img
-          [src]="getHeroImage()"
-          [alt]="genreName"
-        />
-      </div>
-
-      <div class="genre-hero-content">
-        <a class="back-link" routerLink="/browse-by-genre-movies">← All interests</a>
-        <h1>{{ genreName }}</h1>
-        <p>
-          Film i denne genre er samlet i tre sektioner:
-          populære film, seneste udgivelser og bedst ratede film ud fra jeres eget reviewsystem.
-        </p>
-
-        <div class="genre-stats">
-          <span>{{ popularMovies.length }} populære</span>
-          <span>{{ latestMovies.length }} seneste</span>
-          <span>{{ customTopRatedMovies.length }} bruger-ratede</span>
+    <ng-container *ngIf="!isLoading && !hasError">
+      <section class="genre-hero" *ngIf="heroMovie">
+        <div class="genre-hero-image">
+          <img
+            [src]="getHeroImage()"
+            [alt]="genreName"
+          />
         </div>
-      </div>
-    </section>
 
-    <section class="genre-section">
-      <div class="section-header">
-        <h2>Popular movies</h2>
-        <p>De 25 mest populære film i {{ genreName }}</p>
-      </div>
+        <div class="genre-hero-content">
+          <a class="back-link" routerLink="/browse-by-genre-movies">← All interests</a>
+          <h1>{{ genreName }}</h1>
+          <p>
+            Film i denne genre er samlet i fire sektioner:
+            populære film, seneste udgivelser, kommende udgivelser inden for de næste 3 måneder
+            og bedst ratede film ud fra jeres eget reviewsystem.
+          </p>
 
-      <div class="movie-grid">
-        <a
-          class="movie-card"
-          *ngFor="let movie of popularMovies; trackBy: trackByMovieId"
-          [routerLink]="['/show-movie', 'movie', movie.id]"
-        >
-          <div class="movie-poster">
-            <img
-              *ngIf="movie.poster_path"
-              [src]="getPosterUrl(movie.poster_path)"
-              [alt]="getDisplayTitle(movie)"
-            />
+          <div class="genre-stats">
+            <span>{{ popularMovies.length }} populære</span>
+            <span>{{ latestMovies.length }} seneste</span>
+            <span>{{ upcomingMovies.length }} kommende</span>
+            <span>{{ customTopRatedMovies.length }} bruger-ratede</span>
           </div>
-
-          <div class="movie-card-content">
-            <h3>{{ getDisplayTitle(movie) }}</h3>
-            <p *ngIf="getDisplayYear(movie)">{{ getDisplayYear(movie) }}</p>
-          </div>
-        </a>
-      </div>
-    </section>
-
-    <section class="genre-section">
-      <div class="section-header">
-        <h2>Latest movies</h2>
-        <p>De 25 seneste film i {{ genreName }}</p>
-      </div>
-
-      <div class="movie-grid">
-        <a
-          class="movie-card"
-          *ngFor="let movie of latestMovies; trackBy: trackByMovieId"
-          [routerLink]="['/show-movie', 'movie', movie.id]"
-        >
-          <div class="movie-poster">
-            <img
-              *ngIf="movie.poster_path"
-              [src]="getPosterUrl(movie.poster_path)"
-              [alt]="getDisplayTitle(movie)"
-            />
-          </div>
-
-          <div class="movie-card-content">
-            <h3>{{ getDisplayTitle(movie) }}</h3>
-            <p *ngIf="getDisplayYear(movie)">{{ getDisplayYear(movie) }}</p>
-          </div>
-        </a>
-      </div>
-    </section>
-
-    <section class="genre-section">
-      <div class="section-header">
-        <h2>Top rated by our users</h2>
-        <p>Bedst ratede film i {{ genreName }} ud fra jeres eget reviewsystem</p>
-      </div>
-
-      <div class="movie-grid" *ngIf="customTopRatedMovies.length > 0; else noCustomRatedMovies">
-        <a
-          class="movie-card"
-          *ngFor="let movie of customTopRatedMovies; trackBy: trackByMovieId"
-          [routerLink]="['/show-movie', 'movie', movie.id]"
-        >
-          <div class="movie-poster">
-            <img
-              *ngIf="movie.poster_path"
-              [src]="getPosterUrl(movie.poster_path)"
-              [alt]="getDisplayTitle(movie)"
-            />
-          </div>
-
-          <div class="movie-card-content">
-            <h3>{{ getDisplayTitle(movie) }}</h3>
-            <p *ngIf="getDisplayYear(movie)">{{ getDisplayYear(movie) }}</p>
-            <p>Vores rating: {{ formatOwnRating(movie.ownAverageRating) }}/5</p>
-            <p>Reviews: {{ movie.ownRatingCount }}</p>
-          </div>
-        </a>
-      </div>
-
-      <ng-template #noCustomRatedMovies>
-        <div class="empty-section">
-          <p>Der er endnu ikke nok bruger-reviews i denne genre.</p>
         </div>
-      </ng-template>
-    </section>
-  </ng-container>
+      </section>
+
+      <section class="genre-section">
+        <div class="section-header">
+          <h2>Popular movies</h2>
+          <p>De 25 mest populære film i {{ genreName }}</p>
+        </div>
+
+        <div class="featured-movie-grid" *ngIf="getFeaturedStandardMovies(popularMovies).length > 0">
+          <a
+            class="featured-movie-card"
+            *ngFor="let movie of getFeaturedStandardMovies(popularMovies); trackBy: trackByMovieId"
+            [routerLink]="['/show-movie', 'movie', movie.id]"
+          >
+            <div class="featured-movie-poster">
+              <img
+                *ngIf="movie.poster_path"
+                [src]="getPosterUrl(movie.poster_path)"
+                [alt]="getDisplayTitle(movie)"
+              />
+            </div>
+
+            <div class="featured-movie-content">
+              <h3>{{ getDisplayTitle(movie) }}</h3>
+              <p class="featured-meta">Udgivelse: {{ getDisplayReleaseDate(movie) }}</p>
+              <p class="featured-meta">
+                Review rating:
+                <ng-container *ngIf="hasOwnRating(movie.id); else noPopularFeaturedRating">
+                  {{ getOwnAverageRating(movie.id) }} ({{ getOwnReviewCount(movie.id) }} reviews)
+                </ng-container>
+                <ng-template #noPopularFeaturedRating>Ingen ratings endnu</ng-template>
+              </p>
+              <p class="featured-overview">{{ getOverview(movie) }}</p>
+
+              <app-watchlist-button
+                [mediaType]="'movie'"
+                [mediaId]="movie.id"
+              ></app-watchlist-button>
+            </div>
+          </a>
+        </div>
+
+        <div class="movie-grid">
+          <a
+            class="movie-card"
+            *ngFor="let movie of getRemainingStandardMovies(popularMovies); trackBy: trackByMovieId"
+            [routerLink]="['/show-movie', 'movie', movie.id]"
+          >
+            <div class="movie-poster">
+              <img
+                *ngIf="movie.poster_path"
+                [src]="getPosterUrl(movie.poster_path)"
+                [alt]="getDisplayTitle(movie)"
+              />
+            </div>
+
+            <div class="movie-card-content">
+              <h3>{{ getDisplayTitle(movie) }}</h3>
+              <p class="movie-release-date">Udgivelse: {{ getDisplayReleaseDate(movie) }}</p>
+              <p class="movie-rating-line">
+                Review rating:
+                <ng-container *ngIf="hasOwnRating(movie.id); else noPopularGridRating">
+                  {{ getOwnAverageRating(movie.id) }} ({{ getOwnReviewCount(movie.id) }})
+                </ng-container>
+                <ng-template #noPopularGridRating>Ingen ratings endnu</ng-template>
+              </p>
+
+              <app-watchlist-button
+                [mediaType]="'movie'"
+                [mediaId]="movie.id"
+              ></app-watchlist-button>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section class="genre-section">
+        <div class="section-header">
+          <h2>Latest movies</h2>
+          <p>De 25 seneste film i {{ genreName }}</p>
+        </div>
+
+        <div class="featured-movie-grid" *ngIf="getFeaturedStandardMovies(latestMovies).length > 0">
+          <a
+            class="featured-movie-card"
+            *ngFor="let movie of getFeaturedStandardMovies(latestMovies); trackBy: trackByMovieId"
+            [routerLink]="['/show-movie', 'movie', movie.id]"
+          >
+            <div class="featured-movie-poster">
+              <img
+                *ngIf="movie.poster_path"
+                [src]="getPosterUrl(movie.poster_path)"
+                [alt]="getDisplayTitle(movie)"
+              />
+            </div>
+
+            <div class="featured-movie-content">
+              <h3>{{ getDisplayTitle(movie) }}</h3>
+              <p class="featured-meta">Udgivelse: {{ getDisplayReleaseDate(movie) }}</p>
+              <p class="featured-meta">
+                Review rating:
+                <ng-container *ngIf="hasOwnRating(movie.id); else noLatestFeaturedRating">
+                  {{ getOwnAverageRating(movie.id) }} ({{ getOwnReviewCount(movie.id) }} reviews)
+                </ng-container>
+                <ng-template #noLatestFeaturedRating>Ingen ratings endnu</ng-template>
+              </p>
+              <p class="featured-overview">{{ getOverview(movie) }}</p>
+
+              <app-watchlist-button
+                [mediaType]="'movie'"
+                [mediaId]="movie.id"
+              ></app-watchlist-button>
+            </div>
+          </a>
+        </div>
+
+        <div class="movie-grid">
+          <a
+            class="movie-card"
+            *ngFor="let movie of getRemainingStandardMovies(latestMovies); trackBy: trackByMovieId"
+            [routerLink]="['/show-movie', 'movie', movie.id]"
+          >
+            <div class="movie-poster">
+              <img
+                *ngIf="movie.poster_path"
+                [src]="getPosterUrl(movie.poster_path)"
+                [alt]="getDisplayTitle(movie)"
+              />
+            </div>
+
+            <div class="movie-card-content">
+              <h3>{{ getDisplayTitle(movie) }}</h3>
+              <p class="movie-release-date">Udgivelse: {{ getDisplayReleaseDate(movie) }}</p>
+              <p class="movie-rating-line">
+                Review rating:
+                <ng-container *ngIf="hasOwnRating(movie.id); else noLatestGridRating">
+                  {{ getOwnAverageRating(movie.id) }} ({{ getOwnReviewCount(movie.id) }})
+                </ng-container>
+                <ng-template #noLatestGridRating>Ingen ratings endnu</ng-template>
+              </p>
+
+              <app-watchlist-button
+                [mediaType]="'movie'"
+                [mediaId]="movie.id"
+              ></app-watchlist-button>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section class="genre-section">
+        <div class="section-header">
+          <h2>Upcoming movies</h2>
+          <p>Film i {{ genreName }} som udkommer snart eller inden for de næste 3 måneder</p>
+        </div>
+
+        <div class="featured-movie-grid" *ngIf="getFeaturedStandardMovies(upcomingMovies).length > 0">
+          <a
+            class="featured-movie-card"
+            *ngFor="let movie of getFeaturedStandardMovies(upcomingMovies); trackBy: trackByMovieId"
+            [routerLink]="['/show-movie', 'movie', movie.id]"
+          >
+            <div class="featured-movie-poster">
+              <img
+                *ngIf="movie.poster_path"
+                [src]="getPosterUrl(movie.poster_path)"
+                [alt]="getDisplayTitle(movie)"
+              />
+            </div>
+
+            <div class="featured-movie-content">
+              <h3>{{ getDisplayTitle(movie) }}</h3>
+              <p class="featured-meta">Udgivelse: {{ getDisplayReleaseDate(movie) }}</p>
+              <p class="featured-meta">
+                Review rating:
+                <ng-container *ngIf="hasOwnRating(movie.id); else noUpcomingFeaturedRating">
+                  {{ getOwnAverageRating(movie.id) }} ({{ getOwnReviewCount(movie.id) }} reviews)
+                </ng-container>
+                <ng-template #noUpcomingFeaturedRating>Ingen ratings endnu</ng-template>
+              </p>
+              <p class="featured-overview">{{ getOverview(movie) }}</p>
+
+              <app-watchlist-button
+                [mediaType]="'movie'"
+                [mediaId]="movie.id"
+              ></app-watchlist-button>
+            </div>
+          </a>
+        </div>
+
+        <div class="movie-grid">
+          <a
+            class="movie-card"
+            *ngFor="let movie of getRemainingStandardMovies(upcomingMovies); trackBy: trackByMovieId"
+            [routerLink]="['/show-movie', 'movie', movie.id]"
+          >
+            <div class="movie-poster">
+              <img
+                *ngIf="movie.poster_path"
+                [src]="getPosterUrl(movie.poster_path)"
+                [alt]="getDisplayTitle(movie)"
+              />
+            </div>
+
+            <div class="movie-card-content">
+              <h3>{{ getDisplayTitle(movie) }}</h3>
+              <p class="movie-release-date">Udgivelse: {{ getDisplayReleaseDate(movie) }}</p>
+              <p class="movie-rating-line">
+                Review rating:
+                <ng-container *ngIf="hasOwnRating(movie.id); else noUpcomingGridRating">
+                  {{ getOwnAverageRating(movie.id) }} ({{ getOwnReviewCount(movie.id) }})
+                </ng-container>
+                <ng-template #noUpcomingGridRating>Ingen ratings endnu</ng-template>
+              </p>
+
+              <app-watchlist-button
+                [mediaType]="'movie'"
+                [mediaId]="movie.id"
+              ></app-watchlist-button>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section class="genre-section">
+        <div class="section-header">
+          <h2>Top rated by our users</h2>
+          <p>Bedst ratede film i {{ genreName }} ud fra jeres eget reviewsystem</p>
+        </div>
+
+        <div class="featured-movie-grid" *ngIf="getFeaturedRatedMovies(customTopRatedMovies).length > 0">
+          <a
+            class="featured-movie-card"
+            *ngFor="let movie of getFeaturedRatedMovies(customTopRatedMovies); trackBy: trackByMovieId"
+            [routerLink]="['/show-movie', 'movie', movie.id]"
+          >
+            <div class="featured-movie-poster">
+              <img
+                *ngIf="movie.poster_path"
+                [src]="getPosterUrl(movie.poster_path)"
+                [alt]="getDisplayTitle(movie)"
+              />
+            </div>
+
+            <div class="featured-movie-content">
+              <h3>{{ getDisplayTitle(movie) }}</h3>
+              <p class="featured-meta">Udgivelse: {{ getDisplayReleaseDate(movie) }}</p>
+              <p class="featured-meta">Review rating: {{ formatOwnRating(movie.ownAverageRating) }}/5 ({{ movie.ownRatingCount }} reviews)</p>
+              <p class="featured-overview">{{ getOverview(movie) }}</p>
+
+              <app-watchlist-button
+                [mediaType]="'movie'"
+                [mediaId]="movie.id"
+              ></app-watchlist-button>
+            </div>
+          </a>
+        </div>
+
+        <div class="movie-grid" *ngIf="customTopRatedMovies.length > 0; else noCustomRatedMovies">
+          <a
+            class="movie-card"
+            *ngFor="let movie of getRemainingRatedMovies(customTopRatedMovies); trackBy: trackByMovieId"
+            [routerLink]="['/show-movie', 'movie', movie.id]"
+          >
+            <div class="movie-poster">
+              <img
+                *ngIf="movie.poster_path"
+                [src]="getPosterUrl(movie.poster_path)"
+                [alt]="getDisplayTitle(movie)"
+              />
+            </div>
+
+            <div class="movie-card-content">
+              <h3>{{ getDisplayTitle(movie) }}</h3>
+              <p class="movie-release-date">Udgivelse: {{ getDisplayReleaseDate(movie) }}</p>
+              <p>Vores rating: {{ formatOwnRating(movie.ownAverageRating) }}/5</p>
+              <p>Reviews: {{ movie.ownRatingCount }}</p>
+
+              <app-watchlist-button
+                [mediaType]="'movie'"
+                [mediaId]="movie.id"
+              ></app-watchlist-button>
+            </div>
+          </a>
+        </div>
+
+        <ng-template #noCustomRatedMovies>
+          <div class="empty-section">
+            <p>Der er endnu ikke nok bruger-reviews i denne genre.</p>
+          </div>
+        </ng-template>
+      </section>
+    </ng-container>
+  </div>
 </section>

@@ -1,8 +1,14 @@
 .browse-movies-page {
   width: 100%;
   box-sizing: border-box;
-  padding: 24px;
+  padding: 24px 24px 40px 24px;
   color: var(--app-fg);
+}
+
+.browse-page-shell {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
 .browse-header {
@@ -51,6 +57,7 @@
   text-align: left;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
   transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  color: white !important;
 }
 
 .genre-card:hover {
@@ -118,7 +125,7 @@
 
 @media (max-width: 640px) {
   .browse-movies-page {
-    padding: 16px;
+    padding: 16px 16px 28px 16px;
   }
 
   .genre-grid {

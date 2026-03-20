@@ -3,7 +3,6 @@ import { DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FirebaseService } from '../services/firebase.service';
-import { UserProfileService } from '../services/user-profile.service';
 import {
   TmdbCastMember,
   TmdbMediaType,
@@ -18,11 +17,12 @@ import {
 } from '../services/tmdb.service';
 import { ReviewsService } from '../services/reviews.service';
 import { ReviewsComponent } from '../reviews/reviews';
+import { WatchlistButtonComponent } from '../watchlist-button/watchlist-button';
 
 @Component({
   selector: 'app-show-movie',
   standalone: true,
-  imports: [NgIf, NgFor, RouterLink, DecimalPipe, ReviewsComponent],
+  imports: [NgIf, NgFor, RouterLink, DecimalPipe, ReviewsComponent, WatchlistButtonComponent],
   templateUrl: './show-movie.html',
   styleUrl: './show-movie.scss'
 })
@@ -32,10 +32,6 @@ export class ShowMovieComponent implements OnInit, OnDestroy {
   public mediaType: TmdbMediaType = 'movie';
   public mediaId: number = 0;
   public details: TmdbMovieOrTvDetails | null = null;
-
-  public watchlistLoading: boolean = false;
-  public isInWatchlist: boolean = false;
-  public watchlistMessage: string = '';
 
   public seenLoading: boolean = false;
   public seenMessage: string = '';
@@ -56,14 +52,12 @@ export class ShowMovieComponent implements OnInit, OnDestroy {
   private detailsSubscription: Subscription | null = null;
   private providersSubscription: Subscription | null = null;
   private certificatesSubscription: Subscription | null = null;
-  private watchlistRequestId: number = 0;
   private seenRequestId: number = 0;
 
   constructor(
     private route: ActivatedRoute,
     private tmdbService: TmdbService,
     private firebaseService: FirebaseService,
-    private userProfileService: UserProfileService,
     private reviewsService: ReviewsService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone
@@ -79,7 +73,6 @@ export class ShowMovieComponent implements OnInit, OnDestroy {
           this.errorMessage = 'Ugyldig film eller serie.';
           this.loading = false;
           this.details = null;
-          this.isInWatchlist = false;
           this.isMarkedAsSeen = false;
           this.allProviderRegions = [];
           this.certifications = [];
@@ -89,7 +82,6 @@ export class ShowMovieComponent implements OnInit, OnDestroy {
 
         this.mediaType = mediaTypeParam;
         this.mediaId = idParam;
-        this.watchlistMessage = '';
         this.seenMessage = '';
 
         this.loadDetails();
@@ -338,6 +330,10 @@ export class ShowMovieComponent implements OnInit, OnDestroy {
     return this.mediaType === 'tv';
   }
 
+  public getWatchlistButtonMediaType(): TmdbMediaType {
+    return this.getResolvedMediaType();
+  }
+
   public scrollGallery(container: HTMLElement, direction: number): void {
     if (!container) {
       return;
@@ -348,75 +344,6 @@ export class ShowMovieComponent implements OnInit, OnDestroy {
       left: amount * direction,
       behavior: 'smooth'
     });
-  }
-
-  public async toggleWatchlist(): Promise<void> {
-    const currentUser = this.firebaseService.auth.currentUser;
-
-    if (!currentUser) {
-      this.zone.run(() => {
-        this.watchlistMessage = 'Du kan ikke tilføje denne film eller serie til watchlist, fordi du ikke er logget ind.';
-        this.cdr.detectChanges();
-      });
-      return;
-    }
-
-    if (!this.mediaId) {
-      return;
-    }
-
-    this.zone.run(() => {
-      this.watchlistLoading = true;
-      this.watchlistMessage = '';
-      this.cdr.detectChanges();
-    });
-
-    try {
-      const resolvedMediaType = this.getResolvedMediaType();
-
-      if (resolvedMediaType === 'movie') {
-        if (this.isInWatchlist) {
-          await this.userProfileService.removeMovieFromWatchlist(this.mediaId);
-
-          this.zone.run(() => {
-            this.isInWatchlist = false;
-            this.watchlistMessage = 'Filmen er fjernet fra watchlist.';
-          });
-        } else {
-          await this.userProfileService.addMovieToWatchlist(this.mediaId);
-
-          this.zone.run(() => {
-            this.isInWatchlist = true;
-            this.watchlistMessage = 'Filmen er tilføjet til watchlist.';
-          });
-        }
-      } else {
-        if (this.isInWatchlist) {
-          await this.userProfileService.removeSeriesFromWatchlist(this.mediaId);
-
-          this.zone.run(() => {
-            this.isInWatchlist = false;
-            this.watchlistMessage = 'Serien er fjernet fra watchlist.';
-          });
-        } else {
-          await this.userProfileService.addSeriesToWatchlist(this.mediaId);
-
-          this.zone.run(() => {
-            this.isInWatchlist = true;
-            this.watchlistMessage = 'Serien er tilføjet til watchlist.';
-          });
-        }
-      }
-    } catch (error: any) {
-      this.zone.run(() => {
-        this.watchlistMessage = error?.message || 'Der opstod en fejl ved opdatering af watchlist.';
-      });
-    } finally {
-      this.zone.run(() => {
-        this.watchlistLoading = false;
-        this.cdr.detectChanges();
-      });
-    }
   }
 
   public async toggleSeen(): Promise<void> {
@@ -499,7 +426,6 @@ export class ShowMovieComponent implements OnInit, OnDestroy {
           this.details = response.data;
           this.loading = false;
           this.cdr.detectChanges();
-          this.refreshWatchlistState();
           this.refreshSeenState();
           this.loadProviders();
           this.loadCertificates();
@@ -574,48 +500,6 @@ export class ShowMovieComponent implements OnInit, OnDestroy {
         });
       }
     });
-  }
-
-  private async refreshWatchlistState(): Promise<void> {
-    const currentUser = this.firebaseService.auth.currentUser;
-    const requestId = ++this.watchlistRequestId;
-
-    if (!currentUser || !this.mediaId) {
-      this.zone.run(() => {
-        this.isInWatchlist = false;
-        this.cdr.detectChanges();
-      });
-      return;
-    }
-
-    try {
-      let inWatchlist = false;
-      const resolvedMediaType = this.getResolvedMediaType();
-
-      if (resolvedMediaType === 'movie') {
-        inWatchlist = await this.userProfileService.isMovieInMyWatchlist(this.mediaId);
-      } else {
-        inWatchlist = await this.userProfileService.isSeriesInMyWatchlist(this.mediaId);
-      }
-
-      if (requestId !== this.watchlistRequestId) {
-        return;
-      }
-
-      this.zone.run(() => {
-        this.isInWatchlist = inWatchlist;
-        this.cdr.detectChanges();
-      });
-    } catch {
-      if (requestId !== this.watchlistRequestId) {
-        return;
-      }
-
-      this.zone.run(() => {
-        this.isInWatchlist = false;
-        this.cdr.detectChanges();
-      });
-    }
   }
 
   private async refreshSeenState(): Promise<void> {

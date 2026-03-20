@@ -96,17 +96,10 @@
         </div>
 
         <div class="primary-actions">
-          <button
-            type="button"
-            class="action-button"
-            [class.active]="isInWatchlist"
-            [disabled]="watchlistLoading"
-            (click)="toggleWatchlist()"
-          >
-            <span *ngIf="!watchlistLoading && !isInWatchlist">Tilføj til watchlist</span>
-            <span *ngIf="!watchlistLoading && isInWatchlist">Fjern fra watchlist</span>
-            <span *ngIf="watchlistLoading">Opdaterer...</span>
-          </button>
+          <app-watchlist-button
+            [mediaType]="getWatchlistButtonMediaType()"
+            [mediaId]="mediaId"
+          ></app-watchlist-button>
 
           <button
             type="button"
@@ -119,10 +112,6 @@
             <span *ngIf="!seenLoading && isMarkedAsSeen">Fjern set-markering</span>
             <span *ngIf="seenLoading">Opdaterer...</span>
           </button>
-        </div>
-
-        <div class="action-message" *ngIf="watchlistMessage">
-          {{ watchlistMessage }}
         </div>
 
         <div class="action-message" *ngIf="seenMessage">
