@@ -222,6 +222,23 @@ export class TmdbService {
     );
   }
 
+   public discoverByGenre(
+    mediaType: TmdbMediaType,
+    genreId: number,
+    page: number = 1,
+    language: string = 'en-US'
+  ): Observable<BackendTmdbResponse<TmdbSearchMultiResponse>> {
+    let params = new HttpParams();
+    params = params.set('with_genres', String(genreId));
+    params = params.set('page', String(page));
+    params = params.set('language', language);
+
+    return this.http.get<BackendTmdbResponse<TmdbSearchMultiResponse>>(
+      `${this.backendBaseUrl}/discover/${mediaType}`,
+      { params }
+    );
+  }
+
   public getDetails(
     mediaType: TmdbMediaType,
     id: number,

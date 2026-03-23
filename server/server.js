@@ -32,7 +32,7 @@ async function tmdbFetch(url) {
   return {
     ok: response.ok,
     status: response.status,
-    data: data
+    data
   };
 }
 
@@ -97,6 +97,74 @@ app.get('/api/tmdb/search/multi', async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Serverfejl under multi search.',
+      error: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+app.get('/api/tmdb/discover/:mediaType', async (req, res) => {
+  try {
+    const mediaType = String(req.params.mediaType || '').trim();
+    const withGenres = String(req.query.with_genres || '').trim();
+    const page = String(req.query.page || '1');
+    const language = String(req.query.language || 'en-US');
+
+    if (mediaType !== 'movie' && mediaType !== 'tv') {
+      return res.status(400).json({
+        success: false,
+        message: 'mediaType skal være "movie" eller "tv".'
+      });
+    }
+
+    if (withGenres.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Query parameter "with_genres" mangler.'
+      });
+    }
+
+    const url = new URL(`${TMDB_BASE_URL}/discover/${mediaType}`);
+    url.searchParams.set('with_genres', withGenres);
+    url.searchParams.set('page', page);
+    url.searchParams.set('language', language);
+    url.searchParams.set('sort_by', 'popularity.desc');
+
+    const result = await tmdbFetch(url);
+
+    if (!result.ok) {
+      return res.status(result.status).json({
+        success: false,
+        message: 'TMDb returnerede en fejl under discover.',
+        tmdb: result.data
+      });
+    }
+
+    const normalizedResults = Array.isArray(result.data.results)
+      ? result.data.results.map((item) => ({
+          ...item,
+          media_type: mediaType
+        }))
+      : [];
+
+    const filteredResults = normalizedResults.filter((item) => {
+      const hasPoster = !!item.poster_path;
+      const hasBackdrop = !!item.backdrop_path;
+      return hasPoster && hasBackdrop;
+    });
+
+    return res.json({
+      success: true,
+      data: {
+        page: result.data.page || 1,
+        results: filteredResults,
+        total_pages: result.data.total_pages || 0,
+        total_results: result.data.total_results || filteredResults.length
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Serverfejl under discover.',
       error: error instanceof Error ? error.message : String(error)
     });
   }

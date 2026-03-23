@@ -11,14 +11,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 
 
 export const routes: Route[] = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: 'register', component: RegisterComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
-  { path: 'dashboard', component: DashboardComponent },
-  { path: 'profile', component: UserProfile },
-  { path: 'profile/:uid', component: UserProfile },
-  { path: 'show-movie/:mediaType/:id', component: ShowMovieComponent },
+ 
 
     {path: '', redirectTo: '/login', pathMatch: 'full'},
     {path: 'register', component: RegisterComponent},
@@ -27,6 +20,7 @@ export const routes: Route[] = [
     {path: 'dashboard', component: DashboardComponent},
     {path: 'profile', component: UserProfile, canActivate: [AuthGuard]},
     {path: 'profile/:uid', component: UserProfile, canActivate: [AuthGuard]},
+    { path: 'show-movie/:mediaType/:id', component: ShowMovieComponent },
     {path: 'forgot-password', component: ForgotPasswordComponent}
-
+  
 ];

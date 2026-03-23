@@ -1,45 +1,64 @@
 <div class="dashboard">
+  <div *ngIf="featuredItem" class="hero">
+    <a
+      class="hero-box"
+      [routerLink]="['/show-movie', featuredItem.mediaType, featuredItem.id]"
+      [style.background-image]="'linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.8)), url(' + getBackdrop(featuredItem) + ')'"
+    >
+      <div class="hero-content">
+        <h1>{{ getTitle(featuredItem) }}</h1>
+        <p>{{ getType(featuredItem) }} | {{ getDate(featuredItem) }} | Rating: {{ getRating(featuredItem) }}</p>
+        <p *ngIf="getGenres(featuredItem)">{{ getGenres(featuredItem) }}</p>
+        <p>{{ featuredItem.details.overview }}</p>
+      </div>
+    </a>
+  </div>
 
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
 
-    <h1 class="subtitle">Welcome {{ username }} </h1>
-<div class="main-layout">
-
-    <div class="featured">
-        <img src="assets/bigmovie.jpg" alt="featured movie" width="800">
-
-        <h2>Featured Movie</h2>
-        <p>Watch the trailer</p>
-        <button>Play</button>
-
+  <div class="section">
+    <h2>Drama</h2>
+    <div class="card-row">
+      <a class="movie-card" *ngFor="let item of dramaItems" [routerLink]="['/show-movie', item.mediaType, item.id]">
+        <img [src]="getPoster(item)" [alt]="getTitle(item)" />
+        <p>{{ getTitle(item) }}</p>
+        <small>{{ getType(item) }}</small>
+      </a>
     </div>
+  </div>
 
-    <div class="side-content">
-
-        <div class="section">
-            <h2>Continiue Watching</h2>
-            
-            <div class="movie">
-                <p><b>Interstellar</b></p>
-                <p>1h 12m left</p>
-            </div>
-
-            <div class="movie">
-                <p><b>Breaking Bad</b></p>
-                <p>Season 2 Episode 5</p>
-            </div>
-
-            <div class="movie">
-                <p><b>Dune</b></p>
-                <p>12m left</p>
-            </div>
-        </div>
+  <div class="section">
+    <h2>Romance</h2>
+    <div class="card-row">
+      <a class="movie-card" *ngFor="let item of romanceItems" [routerLink]="['/show-movie', item.mediaType, item.id]">
+        <img [src]="getPoster(item)" [alt]="getTitle(item)" />
+        <p>{{ getTitle(item) }}</p>
+        <small>{{ getType(item) }}</small>
+      </a>
     </div>
+  </div>
 
-</div>
-        
+  <div class="section">
+    <h2>Comedy</h2>
+    <div class="card-row">
+      <a class="movie-card" *ngFor="let item of comedyItems" [routerLink]="['/show-movie', item.mediaType, item.id]">
+        <img [src]="getPoster(item)" [alt]="getTitle(item)" />
+        <p>{{ getTitle(item) }}</p>
+        <small>{{ getType(item) }}</small>
+      </a>
+    </div>
+  </div>
 
-
-
-
-        
+  <div class="section">
+    <h2>Action & Adventure</h2>
+    <div class="card-row">
+      <a class="movie-card" *ngFor="let item of actionItems" [routerLink]="['/show-movie', item.mediaType, item.id]">
+        <img [src]="getPoster(item)" [alt]="getTitle(item)" />
+        <p>{{ getTitle(item) }}</p>
+        <small>{{ getType(item) }}</small>
+      </a>
+    </div>
+  </div>
 </div>
