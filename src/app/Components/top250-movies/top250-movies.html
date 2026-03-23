@@ -1,1 +1,59 @@
-<p>top250-movies works!</p>
+<section class="top-movies-page">
+  <div class="top-movies-shell">
+    <div class="top-movies-header">
+      <h1>Top 250 Movies</h1>
+      <p>Browse the highest rated movies in order.</p>
+    </div>
+
+    <div class="status-row" *ngIf="isLoading">
+      <p>Loading top movies...</p>
+    </div>
+
+    <div class="status-row error" *ngIf="hasError">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <div class="movie-list" *ngIf="!isLoading && !hasError && movies.length > 0">
+      <button
+        type="button"
+        class="movie-row"
+        *ngFor="let movie of movies; trackBy: trackByMovieId"
+        (click)="openMovie(movie.id)"
+      >
+        <div class="movie-rank">
+          <span>#{{ movie.rank }}</span>
+        </div>
+
+        <div class="movie-poster">
+          <img
+            *ngIf="movie.poster_path; else noPoster"
+            [src]="tmdbService.getPosterUrl(movie.poster_path, 'w342')"
+            [alt]="getMovieTitle(movie)"
+          />
+
+          <ng-template #noPoster>
+            <div class="no-poster">No Image</div>
+          </ng-template>
+        </div>
+
+        <div class="movie-content">
+          <h2>{{ getMovieTitle(movie) }}</h2>
+
+          <div class="movie-meta">
+            <span *ngIf="movie.release_date">{{ getYear(movie.release_date) }}</span>
+            <span>★ {{ movie.vote_average | number:'1.1-1' }}</span>
+            <span *ngIf="movie.vote_count">({{ movie.vote_count | number }} votes)</span>
+          </div>
+
+          <p *ngIf="movie.overview">
+            {{ truncateText(movie.overview, 180) }}
+          </p>
+        </div>
+      </button>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && !hasError && movies.length === 0">
+      <p>No movies could be displayed.</p>
+    </div>
+  </div>
+</section>

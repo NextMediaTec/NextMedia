@@ -668,4 +668,14 @@ export class TmdbService {
 
     return map[countryCode] || countryCode;
   }
+
+public getTopRatedMovies(page: number = 1): Observable<BackendTmdbResponse<TmdbSearchMultiResponse>> {
+  let params = new HttpParams();
+  params = params.set('page', String(page));
+
+  return this.http.get<BackendTmdbResponse<TmdbSearchMultiResponse>>(
+    `${this.backendBaseUrl}/movie/top_rated`,
+    { params }
+  );
+}
 }

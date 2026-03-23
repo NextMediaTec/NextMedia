@@ -348,6 +348,51 @@ app.get('/api/tmdb/genre/movie/list', async (req, res) => {
   }
 });
 
+app.get('/api/tmdb/movie/top_rated', async (req, res) => {
+  try {
+    const page = String(req.query.page || '1');
+    const language = String(req.query.language || 'en-US');
+
+    const url = new URL(`${TMDB_BASE_URL}/movie/top_rated`);
+    url.searchParams.set('page', page);
+    url.searchParams.set('language', language);
+
+    const result = await tmdbFetch(url);
+
+    if (!result.ok) {
+      return res.status(result.status).json({
+        success: false,
+        message: 'TMDb returnerede en fejl under hentning af top rated movies.',
+        tmdb: result.data
+      });
+    }
+
+    const mappedResults = Array.isArray(result.data.results)
+      ? result.data.results.map((item) => ({
+          ...item,
+          media_type: 'movie'
+        }))
+      : [];
+
+    return res.json({
+      success: true,
+      data: {
+        page: result.data.page || 1,
+        results: mappedResults,
+        total_pages: result.data.total_pages || 0,
+        total_results: result.data.total_results || mappedResults.length
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Serverfejl under hentning af top rated movies.',
+      error: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+
 app.get('/api/tmdb/discover/movie', async (req, res) => {
   try {
     const page = String(req.query.page || '1');
