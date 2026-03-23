@@ -43,6 +43,10 @@ export interface TmdbMovieGenresResponse {
   genres: TmdbGenre[];
 }
 
+export interface TmdbTvGenresResponse {
+  genres: TmdbGenre[];
+}
+
 export interface TmdbDiscoverMovieOptions {
   page?: number;
   withGenres?: string;
@@ -50,6 +54,8 @@ export interface TmdbDiscoverMovieOptions {
   sortBy?: string;
   releaseDateLte?: string;
   releaseDateGte?: string;
+  firstAirDateLte?: string;
+  firstAirDateGte?: string;
   voteCountGte?: number;
   region?: string;
 }
@@ -292,6 +298,137 @@ export interface TmdbDiscoverMovieResponse {
   total_results: number;
 }
 
+export interface TmdbPersonImageProfile {
+  aspect_ratio?: number;
+  file_path: string;
+  height?: number;
+  iso_639_1?: string | null;
+  vote_average?: number;
+  vote_count?: number;
+  width?: number;
+}
+
+export interface TmdbPersonImages {
+  profiles: TmdbPersonImageProfile[];
+}
+
+export interface TmdbPersonExternalIds {
+  imdb_id?: string | null;
+  wikidata_id?: string | null;
+  facebook_id?: string | null;
+  instagram_id?: string | null;
+  twitter_id?: string | null;
+  tiktok_id?: string | null;
+  youtube_id?: string | null;
+}
+
+export interface TmdbPersonCastCredit {
+  adult?: boolean;
+  backdrop_path: string | null;
+  character?: string;
+  credit_id: string;
+  id: number;
+  media_type: TmdbMediaType;
+  name?: string;
+  original_name?: string;
+  original_title?: string;
+  overview?: string;
+  popularity?: number;
+  poster_path: string | null;
+  release_date?: string;
+  first_air_date?: string;
+  title?: string;
+  vote_average?: number;
+  vote_count?: number;
+}
+
+export interface TmdbPersonCrewCredit {
+  adult?: boolean;
+  backdrop_path: string | null;
+  credit_id: string;
+  department?: string;
+  id: number;
+  job?: string;
+  media_type: TmdbMediaType;
+  name?: string;
+  original_name?: string;
+  original_title?: string;
+  overview?: string;
+  popularity?: number;
+  poster_path: string | null;
+  release_date?: string;
+  first_air_date?: string;
+  title?: string;
+  vote_average?: number;
+  vote_count?: number;
+}
+
+export interface TmdbPersonCombinedCredits {
+  cast: TmdbPersonCastCredit[];
+  crew: TmdbPersonCrewCredit[];
+}
+
+export interface TmdbPersonMovieCredits {
+  cast: TmdbPersonCastCredit[];
+  crew: TmdbPersonCrewCredit[];
+}
+
+export interface TmdbPersonTvCredits {
+  cast: TmdbPersonCastCredit[];
+  crew: TmdbPersonCrewCredit[];
+}
+
+export interface TmdbPersonDetails {
+  adult?: boolean;
+  also_known_as?: string[];
+  biography?: string;
+  birthday?: string | null;
+  deathday?: string | null;
+  gender?: number;
+  homepage?: string | null;
+  id: number;
+  imdb_id?: string | null;
+  known_for_department?: string;
+  name: string;
+  place_of_birth?: string | null;
+  popularity?: number;
+  profile_path: string | null;
+  images?: TmdbPersonImages;
+  external_ids?: TmdbPersonExternalIds;
+  combined_credits?: TmdbPersonCombinedCredits;
+  movie_credits?: TmdbPersonMovieCredits;
+  tv_credits?: TmdbPersonTvCredits;
+}
+
+export interface TmdbPersonCreditListItem {
+  credit_id: string;
+  id: number;
+  media_type: TmdbMediaType;
+  title: string;
+  name: string;
+  original_title: string;
+  original_name: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  release_date: string;
+  first_air_date: string;
+  popularity: number;
+  vote_average: number;
+  vote_count: number;
+  character: string;
+  job: string;
+  department: string;
+  credit_type: 'cast' | 'crew';
+}
+
+export interface TmdbPersonPageResponse {
+  person: TmdbPersonDetails;
+  combinedCredits: TmdbPersonCreditListItem[];
+  mostPopularMovies: TmdbPersonCreditListItem[];
+  boxOfficeTotal: number | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -321,7 +458,7 @@ export class TmdbService {
     );
   }
 
-   public discoverByGenre(
+  public discoverByGenre(
     mediaType: TmdbMediaType,
     genreId: number,
     page: number = 1,
@@ -349,6 +486,20 @@ export class TmdbService {
 
     return this.http.get<BackendTmdbResponse<TmdbMovieOrTvDetails>>(
       `${this.backendBaseUrl}/details/${mediaType}/${id}`,
+      { params }
+    );
+  }
+
+  public getPersonDetails(
+    id: number,
+    language: string = 'en-US'
+  ): Observable<BackendTmdbResponse<TmdbPersonPageResponse>> {
+    let params = new HttpParams();
+    params = params.set('language', language);
+    params = params.set('include_image_language', 'en,null');
+
+    return this.http.get<BackendTmdbResponse<TmdbPersonPageResponse>>(
+      `${this.backendBaseUrl}/person/${id}`,
       { params }
     );
   }
@@ -389,6 +540,18 @@ export class TmdbService {
 
     return this.http.get<BackendTmdbResponse<TmdbMovieGenresResponse>>(
       `${this.backendBaseUrl}/genre/movie/list`,
+      { params }
+    );
+  }
+
+  public getTvGenres(
+    language: string = 'en-US'
+  ): Observable<BackendTmdbResponse<TmdbTvGenresResponse>> {
+    let params = new HttpParams();
+    params = params.set('language', language);
+
+    return this.http.get<BackendTmdbResponse<TmdbTvGenresResponse>>(
+      `${this.backendBaseUrl}/genre/tv/list`,
       { params }
     );
   }
@@ -445,6 +608,41 @@ export class TmdbService {
 
     return this.http.get<BackendTmdbResponse<TmdbSearchMultiResponse>>(
       `${this.backendBaseUrl}/discover/movie`,
+      { params }
+    );
+  }
+
+  public discoverTvAdvanced(
+    options: TmdbDiscoverMovieOptions
+  ): Observable<BackendTmdbResponse<TmdbSearchMultiResponse>> {
+    let params = new HttpParams();
+
+    params = params.set('page', String(options.page ?? 1));
+    params = params.set('language', options.language ?? 'en-US');
+    params = params.set('sort_by', options.sortBy ?? 'popularity.desc');
+
+    if (String(options.withGenres || '').trim().length > 0) {
+      params = params.set('with_genres', String(options.withGenres).trim());
+    }
+
+    if (String(options.firstAirDateLte || '').trim().length > 0) {
+      params = params.set('first_air_date.lte', String(options.firstAirDateLte).trim());
+    }
+
+    if (String(options.firstAirDateGte || '').trim().length > 0) {
+      params = params.set('first_air_date.gte', String(options.firstAirDateGte).trim());
+    }
+
+    if (typeof options.voteCountGte === 'number' && !Number.isNaN(options.voteCountGte)) {
+      params = params.set('vote_count.gte', String(options.voteCountGte));
+    }
+
+    if (String(options.region || '').trim().length > 0) {
+      params = params.set('region', String(options.region).trim());
+    }
+
+    return this.http.get<BackendTmdbResponse<TmdbSearchMultiResponse>>(
+      `${this.backendBaseUrl}/discover/tv`,
       { params }
     );
   }

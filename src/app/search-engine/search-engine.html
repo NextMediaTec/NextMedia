@@ -5,7 +5,7 @@
     (input)="onSearchInput()"
     (focus)="onSearchFocus()"
     (blur)="onSearchBlur()"
-    placeholder="Søg efter brugere, film eller serier"
+    placeholder="Søg efter brugere, film, serier eller celebs"
   />
 
   <div class="search-results" *ngIf="showResults">
@@ -24,7 +24,7 @@
     </div>
 
     <div class="search-section" *ngIf="filteredMedia.length > 0">
-      <div class="search-section-title">Film og serier</div>
+      <div class="search-section-title">Film, serier og celebs</div>
 
       <div
         class="search-result-item media-result"
@@ -33,8 +33,8 @@
       >
         <img
           class="media-poster"
-          *ngIf="getMediaPoster(item.poster_path)"
-          [src]="getMediaPoster(item.poster_path)"
+          *ngIf="getMediaPoster(item)"
+          [src]="getMediaPoster(item)"
           [alt]="getMediaTitle(item)"
         />
 
@@ -52,7 +52,7 @@
     </div>
 
     <div class="search-section" *ngIf="mediaLoading">
-      <div class="search-loading-text">Henter film og serier...</div>
+      <div class="search-loading-text">Henter film, serier og celebs...</div>
     </div>
   </div>
 </div>

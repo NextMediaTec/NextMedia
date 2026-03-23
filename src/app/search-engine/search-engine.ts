@@ -5,7 +5,7 @@ import { NgFor, NgIf } from '@angular/common';
 import { Unsubscribe } from 'firebase/database';
 import { Subscription } from 'rxjs';
 import { SearchEngineService, SearchEngineUserResult } from '../services/search-engine.service';
-import { TmdbMediaType, TmdbSearchMultiResult, TmdbService } from '../services/tmdb.service';
+import { TmdbSearchMultiResult, TmdbService } from '../services/tmdb.service';
 
 @Component({
   selector: 'app-search-engine',
@@ -78,36 +78,76 @@ export class SearchEngine implements OnInit, OnDestroy {
   }
 
   public openMedia(item: TmdbSearchMultiResult): void {
-    const safeType = item.media_type;
+    const safeType = String(item.media_type || '').trim();
     const safeId = Number(item.id);
 
-    if ((safeType !== 'movie' && safeType !== 'tv') || !safeId) {
+    if (!safeId) {
       return;
     }
 
     this.showResults = false;
     this.searchText = this.getMediaTitle(item);
-    this.router.navigate(['/show-movie', safeType, safeId]);
+
+    if (safeType === 'person') {
+      this.router.navigate(['/show-celeb', safeId]);
+      return;
+    }
+
+    if (safeType === 'movie' || safeType === 'tv') {
+      this.router.navigate(['/show-movie', safeType, safeId]);
+    }
   }
 
   public getMediaTitle(item: TmdbSearchMultiResult): string {
-    return this.tmdbService.getDisplayTitle(item);
+    const movieTitle = String(item.title || item.original_title || '').trim();
+    const tvTitle = String(item.name || item.original_name || '').trim();
+
+    if (movieTitle.length > 0) {
+      return movieTitle;
+    }
+
+    return tvTitle;
   }
 
   public getMediaDate(item: TmdbSearchMultiResult): string {
-    return this.tmdbService.getDisplayDate(item);
+    if (String(item.media_type || '').trim() === 'person') {
+      return '';
+    }
+
+    const movieDate = String(item.release_date || '').trim();
+    const tvDate = String(item.first_air_date || '').trim();
+
+    if (movieDate.length > 0) {
+      return movieDate;
+    }
+
+    return tvDate;
   }
 
-  public getMediaPoster(path: string | null): string {
-    return this.tmdbService.getPosterUrl(path, 'w185');
+  public getMediaPoster(item: TmdbSearchMultiResult): string {
+    const safeType = String(item.media_type || '').trim();
+
+    if (safeType === 'person') {
+      return this.tmdbService.getProfileUrl(item.profile_path || null, 'w185');
+    }
+
+    return this.tmdbService.getPosterUrl(item.poster_path || null, 'w185');
   }
 
-  public getMediaTypeLabel(mediaType: TmdbMediaType): string {
+  public getMediaTypeLabel(mediaType: string): string {
     if (mediaType === 'movie') {
       return 'Film';
     }
 
-    return 'Serie';
+    if (mediaType === 'tv') {
+      return 'Serie';
+    }
+
+    if (mediaType === 'person') {
+      return 'Celeb';
+    }
+
+    return '';
   }
 
   private applyFilter(): void {

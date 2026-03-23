@@ -1,0 +1,157 @@
+<section class="show-celeb-page">
+  <div class="status-row" *ngIf="isLoading">
+    <p>Henter persondata...</p>
+  </div>
+
+  <div class="status-row error" *ngIf="hasError && !isLoading">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <ng-container *ngIf="!isLoading && !hasError && person">
+    <div class="hero-card">
+      <div class="hero-image">
+        <img
+          *ngIf="person.profile_path; else noProfileImage"
+          [src]="tmdbService.getProfileUrl(person.profile_path, 'w500')"
+          [alt]="getPersonName()"
+        />
+
+        <ng-template #noProfileImage>
+          <div class="no-profile-image">No image</div>
+        </ng-template>
+      </div>
+
+      <div class="hero-content">
+        <h1>{{ getPersonName() }}</h1>
+
+        <div class="meta-grid">
+          <div class="meta-item" *ngIf="getKnownDepartment()">
+            <span class="meta-label">Department</span>
+            <span class="meta-value">{{ getKnownDepartment() }}</span>
+          </div>
+
+          <div class="meta-item" *ngIf="getBirthday()">
+            <span class="meta-label">Born</span>
+            <span class="meta-value">{{ getBirthday() }}</span>
+          </div>
+
+          <div class="meta-item" *ngIf="getAge() !== null">
+            <span class="meta-label">Age</span>
+            <span class="meta-value">{{ getAge() }}</span>
+          </div>
+
+          <div class="meta-item" *ngIf="getDeathday()">
+            <span class="meta-label">Died</span>
+            <span class="meta-value">{{ getDeathday() }}</span>
+          </div>
+
+          <div class="meta-item" *ngIf="getPlaceOfBirth()">
+            <span class="meta-label">Place of birth</span>
+            <span class="meta-value">{{ getPlaceOfBirth() }}</span>
+          </div>
+
+          <div class="meta-item" *ngIf="boxOfficeTotal !== null">
+            <span class="meta-label">Box office total</span>
+            <span class="meta-value">{{ formatMoney(boxOfficeTotal) }}</span>
+          </div>
+        </div>
+
+        <div class="biography-block" *ngIf="hasBiography()">
+          <h2>Biography</h2>
+          <p>{{ getBiography() }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-section" *ngIf="mostPopularMovies.length > 0">
+      <div class="section-header">
+        <h2>Most Popular Movies</h2>
+      </div>
+
+      <div class="popular-grid">
+        <a
+          class="popular-card"
+          *ngFor="let item of mostPopularMovies; trackBy: trackByPopularMovie"
+          [routerLink]="['/show-movie', item.media_type, item.id]"
+        >
+          <div class="popular-poster">
+            <img
+              *ngIf="item.poster_path; else noPopularPoster"
+              [src]="tmdbService.getPosterUrl(item.poster_path, 'w500')"
+              [alt]="getDisplayTitle(item)"
+            />
+
+            <ng-template #noPopularPoster>
+              <div class="no-poster">No poster</div>
+            </ng-template>
+          </div>
+
+          <div class="popular-info">
+            <h3>{{ getDisplayTitle(item) }}</h3>
+
+            <p *ngIf="getDisplayYear(item)">
+              {{ getDisplayYear(item) }}
+            </p>
+
+            <p *ngIf="getCreditRole(item)">
+              {{ getCreditRole(item) }}
+            </p>
+
+            <p *ngIf="formatVoteAverage(item.vote_average)">
+              Rating: {{ formatVoteAverage(item.vote_average) }}
+            </p>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="content-section" *ngIf="combinedCredits.length > 0">
+      <div class="section-header">
+        <h2>All Movies and Series</h2>
+      </div>
+
+      <div class="credits-list">
+        <a
+          class="credit-row"
+          *ngFor="let item of combinedCredits; trackBy: trackByCredit"
+          [routerLink]="['/show-movie', item.media_type, item.id]"
+        >
+          <div class="credit-poster">
+            <img
+              *ngIf="item.poster_path; else noCreditPoster"
+              [src]="tmdbService.getPosterUrl(item.poster_path, 'w342')"
+              [alt]="getDisplayTitle(item)"
+            />
+
+            <ng-template #noCreditPoster>
+              <div class="no-poster small">No poster</div>
+            </ng-template>
+          </div>
+
+          <div class="credit-main">
+            <div class="credit-top">
+              <h3>{{ getDisplayTitle(item) }}</h3>
+
+              <span class="credit-year" *ngIf="getDisplayYear(item)">
+                {{ getDisplayYear(item) }}
+              </span>
+            </div>
+
+            <div class="credit-tags">
+              <span class="tag">{{ getMediaTypeLabel(item) }}</span>
+              <span class="tag">{{ getCreditTypeLabel(item) }}</span>
+
+              <span class="tag role-tag" *ngIf="getCreditRole(item)">
+                {{ getCreditRole(item) }}
+              </span>
+            </div>
+
+            <p class="credit-overview" *ngIf="item.overview">
+              {{ item.overview }}
+            </p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </ng-container>
+</section>
