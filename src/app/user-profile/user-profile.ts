@@ -5,9 +5,10 @@ import { User, onAuthStateChanged } from 'firebase/auth';
 
 import { FirebaseService } from '../services/firebase.service';
 import { UserProfileService } from '../services/user-profile.service';
+import { TmdbService } from '../services/tmdb.service';
 import { ActivatedRoute } from '@angular/router';
 import { Unsubscribe } from 'firebase/database';
-import { Subscription } from 'rxjs';
+import { Subscription, firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-user-profile',
@@ -57,6 +58,11 @@ export class UserProfile implements OnInit, OnDestroy {
   isShowMyReviews: boolean = false;
 
   watchlistMovies: any[] = [];
+  watchlistSeries: any[] = [];
+
+  watchlistMovieDetails: any[] = [];
+  watchlistSeriesDetails: any[] = [];
+
   favoriteMovies: any[] = [];
   favoriteSeries: any[] = [];
 
@@ -71,7 +77,8 @@ export class UserProfile implements OnInit, OnDestroy {
   friendSearchText: string = '';
   friendRequestUsername: string = '';
 
-  private unsubWatchlist: Unsubscribe | null = null;
+  private unsubWatchlistMovies: Unsubscribe | null = null;
+  private unsubWatchlistSeries: Unsubscribe | null = null;
   private unsubFavMovies: Unsubscribe | null = null;
   private unsubFavSeries: Unsubscribe | null = null;
   private unsubMovieReviews: Unsubscribe | null = null;
@@ -91,9 +98,13 @@ export class UserProfile implements OnInit, OnDestroy {
 
   private sendCounter: number = 0;
 
+  private movieDetailsLoadVersion: number = 0;
+  private seriesDetailsLoadVersion: number = 0;
+
   constructor(
     private firebaseService: FirebaseService,
     private userProfileService: UserProfileService,
+    private tmdbService: TmdbService,
     private route: ActivatedRoute,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef
@@ -109,6 +120,10 @@ export class UserProfile implements OnInit, OnDestroy {
           this.viewedUid = '';
           this.isOwner = false;
           this.teardownRealtimeSubscriptions();
+          this.watchlistMovies = [];
+          this.watchlistSeries = [];
+          this.watchlistMovieDetails = [];
+          this.watchlistSeriesDetails = [];
           this.cdr.detectChanges();
           return;
         }
@@ -244,7 +259,8 @@ export class UserProfile implements OnInit, OnDestroy {
   }
 
   private teardownRealtimeSubscriptions(): void {
-    if (this.unsubWatchlist) { this.unsubWatchlist(); this.unsubWatchlist = null; }
+    if (this.unsubWatchlistMovies) { this.unsubWatchlistMovies(); this.unsubWatchlistMovies = null; }
+    if (this.unsubWatchlistSeries) { this.unsubWatchlistSeries(); this.unsubWatchlistSeries = null; }
     if (this.unsubFavMovies) { this.unsubFavMovies(); this.unsubFavMovies = null; }
     if (this.unsubFavSeries) { this.unsubFavSeries(); this.unsubFavSeries = null; }
     if (this.unsubMovieReviews) { this.unsubMovieReviews(); this.unsubMovieReviews = null; }
@@ -260,12 +276,25 @@ export class UserProfile implements OnInit, OnDestroy {
     const uid = (this.viewedUid || '').trim();
     if (uid.length === 0) return;
 
-    this.unsubWatchlist = this.userProfileService.subscribeUserKeyedList(
+    this.unsubWatchlistMovies = this.userProfileService.subscribeUserKeyedList(
       `users/${uid}/watchlistMovies`,
       'movieId',
       (items: any[]) => {
         this.ngZone.run(() => {
-          this.watchlistMovies = items;
+          this.watchlistMovies = Array.isArray(items) ? items : [];
+          this.loadWatchlistMovieDetails();
+          this.cdr.detectChanges();
+        });
+      }
+    );
+
+    this.unsubWatchlistSeries = this.userProfileService.subscribeUserKeyedList(
+      `users/${uid}/watchlistSeries`,
+      'seriesId',
+      (items: any[]) => {
+        this.ngZone.run(() => {
+          this.watchlistSeries = Array.isArray(items) ? items : [];
+          this.loadWatchlistSeriesDetails();
           this.cdr.detectChanges();
         });
       }
@@ -354,6 +383,154 @@ export class UserProfile implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       });
     }
+  }
+
+  private async loadWatchlistMovieDetails(): Promise<void> {
+    this.movieDetailsLoadVersion++;
+    const currentVersion = this.movieDetailsLoadVersion;
+
+    const rawItems = Array.isArray(this.watchlistMovies) ? [...this.watchlistMovies] : [];
+
+    if (rawItems.length === 0) {
+      this.watchlistMovieDetails = [];
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const result: any[] = [];
+
+    for (let i = 0; i < rawItems.length; i++) {
+      const item = rawItems[i];
+      const movieId = Number(item?.movieId);
+
+      if (!movieId) {
+        result.push({
+          movieId: item?.movieId || '',
+          title: 'Unknown',
+          posterUrl: '',
+          genresText: 'Unknown',
+          releaseDate: '—',
+          ratingText: '—',
+          createdAt: item?.createdAt || '—'
+        });
+        continue;
+      }
+
+      try {
+        const response = await firstValueFrom(this.tmdbService.getDetails('movie', movieId));
+
+        if (currentVersion !== this.movieDetailsLoadVersion) {
+          return;
+        }
+
+        const details = response?.data;
+
+        const genresText = Array.isArray(details?.genres) && details.genres.length > 0
+          ? details.genres.map((g: any) => g?.name).filter((x: any) => !!x).join(', ')
+          : 'Unknown';
+
+        result.push({
+          movieId: movieId,
+          title: this.tmdbService.getDisplayTitle(details) || String(movieId),
+          posterUrl: this.tmdbService.getPosterUrl(details?.poster_path || null, 'w185'),
+          genresText: genresText,
+          releaseDate: this.tmdbService.getDisplayDate(details) || '—',
+          ratingText: typeof details?.vote_average === 'number' ? details.vote_average.toFixed(1) : '—',
+          createdAt: item?.createdAt || '—'
+        });
+      } catch (error) {
+        result.push({
+          movieId: movieId,
+          title: String(movieId),
+          posterUrl: '',
+          genresText: 'Unknown',
+          releaseDate: '—',
+          ratingText: '—',
+          createdAt: item?.createdAt || '—'
+        });
+      }
+    }
+
+    if (currentVersion !== this.movieDetailsLoadVersion) {
+      return;
+    }
+
+    this.watchlistMovieDetails = result;
+    this.cdr.detectChanges();
+  }
+
+  private async loadWatchlistSeriesDetails(): Promise<void> {
+    this.seriesDetailsLoadVersion++;
+    const currentVersion = this.seriesDetailsLoadVersion;
+
+    const rawItems = Array.isArray(this.watchlistSeries) ? [...this.watchlistSeries] : [];
+
+    if (rawItems.length === 0) {
+      this.watchlistSeriesDetails = [];
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const result: any[] = [];
+
+    for (let i = 0; i < rawItems.length; i++) {
+      const item = rawItems[i];
+      const seriesId = Number(item?.seriesId);
+
+      if (!seriesId) {
+        result.push({
+          seriesId: item?.seriesId || '',
+          title: 'Unknown',
+          posterUrl: '',
+          genresText: 'Unknown',
+          releaseDate: '—',
+          ratingText: '—',
+          createdAt: item?.createdAt || '—'
+        });
+        continue;
+      }
+
+      try {
+        const response = await firstValueFrom(this.tmdbService.getDetails('tv', seriesId));
+
+        if (currentVersion !== this.seriesDetailsLoadVersion) {
+          return;
+        }
+
+        const details = response?.data;
+
+        const genresText = Array.isArray(details?.genres) && details.genres.length > 0
+          ? details.genres.map((g: any) => g?.name).filter((x: any) => !!x).join(', ')
+          : 'Unknown';
+
+        result.push({
+          seriesId: seriesId,
+          title: this.tmdbService.getDisplayTitle(details) || String(seriesId),
+          posterUrl: this.tmdbService.getPosterUrl(details?.poster_path || null, 'w185'),
+          genresText: genresText,
+          releaseDate: this.tmdbService.getDisplayDate(details) || '—',
+          ratingText: typeof details?.vote_average === 'number' ? details.vote_average.toFixed(1) : '—',
+          createdAt: item?.createdAt || '—'
+        });
+      } catch (error) {
+        result.push({
+          seriesId: seriesId,
+          title: String(seriesId),
+          posterUrl: '',
+          genresText: 'Unknown',
+          releaseDate: '—',
+          ratingText: '—',
+          createdAt: item?.createdAt || '—'
+        });
+      }
+    }
+
+    if (currentVersion !== this.seriesDetailsLoadVersion) {
+      return;
+    }
+
+    this.watchlistSeriesDetails = result;
+    this.cdr.detectChanges();
   }
 
   private optimisticUpsertOutgoing(toUid: string, createdAt: string, status: string): void {
@@ -677,6 +854,15 @@ export class UserProfile implements OnInit, OnDestroy {
     if (fallback) return fallback.src;
 
     return 'assets/avatars/avatar-01.png';
+  }
+
+  getWatchlistPosterOrFallback(posterUrl: string): string {
+    const safePosterUrl = (posterUrl || '').trim();
+    if (safePosterUrl.length > 0) {
+      return safePosterUrl;
+    }
+
+    return this.getAvatarSrcById(this.defaultAvatarId);
   }
 
   private isAvatarIdValid(avatarId: string): boolean {

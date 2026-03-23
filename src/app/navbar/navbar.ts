@@ -1,15 +1,21 @@
-import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { FirebaseService } from '../services/firebase.service';
 import { ref, onValue, Unsubscribe } from 'firebase/database';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { SearchEngine } from '../search-engine/search-engine';
 import { AuthService } from '../services/auth.service';
-import { CommonModule } from '@angular/common';
 
+interface NavbarMenuItem {
+  label: string;
+  route: string;
+}
 
-
-
+interface NavbarMenuSection {
+  title: string;
+  items: NavbarMenuItem[];
+}
 
 @Component({
   selector: 'app-navbar',
@@ -27,6 +33,8 @@ export class Navbar implements OnInit, OnDestroy {
   public defaultAvatarId: string = 'avatar-01';
   public loggedInAvatarId: string = 'avatar-01';
 
+  public isBurgerMenuOpen: boolean = false;
+
   public avatarOptions: { id: string; src: string }[] = [
     { id: 'avatar-01', src: '/assets/avatars/cat.png' },
     { id: 'avatar-02', src: 'assets/avatars/dog.png' },
@@ -42,6 +50,7 @@ export class Navbar implements OnInit, OnDestroy {
 
   private authUnsubscribe: (() => void) | null = null;
   private userProfileUnsubscribe: Unsubscribe | null = null;
+  private routerEventsUnsubscribe: (() => void) | null = null;
 
   constructor(
     private firebase: FirebaseService,
@@ -49,6 +58,37 @@ export class Navbar implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router
   ) {}
+
+  public get burgerMenuSections(): NavbarMenuSection[] {
+    return [
+      {
+        title: 'Movies',
+        items: [
+          { label: 'Browse By Genre Movies', route: '/browse-by-genre-movies' },
+          { label: 'Most Popular Movies', route: '/most-popular-movies' },
+          { label: 'Release Calendar Movies', route: '/release-calender-movies' },
+          { label: 'Top 250 Movies', route: '/top250-movies' },
+          { label: 'Top Box Office', route: '/top-box-office' }
+        ]
+      },
+      {
+        title: 'Series',
+        items: [
+          { label: 'Browse By Genre Series', route: '/browse-by-genre-series' },
+          { label: 'Most Popular Series', route: '/most-popular-series' },
+          { label: 'Release Calendar Series', route: '/release-calender-series' },
+          { label: 'Top 250 Series', route: '/top250-series' }
+        ]
+      },
+      {
+        title: 'Celebs',
+        items: [
+          { label: 'Celebs Born Today', route: '/celebs-born-today' },
+          { label: 'Most Popular Celeb', route: '/most-popular-celeb' }
+        ]
+      }
+    ];
+  }
 
   ngOnInit(): void {
     this.authUnsubscribe = onAuthStateChanged(this.firebase.auth, (authUser: User | null) => {
@@ -132,6 +172,16 @@ export class Navbar implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       });
     });
+
+    const routerSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.closeBurgerMenu();
+      }
+    });
+
+    this.routerEventsUnsubscribe = () => {
+      routerSubscription.unsubscribe();
+    };
   }
 
   ngOnDestroy(): void {
@@ -144,6 +194,26 @@ export class Navbar implements OnInit, OnDestroy {
       this.userProfileUnsubscribe();
       this.userProfileUnsubscribe = null;
     }
+
+    if (this.routerEventsUnsubscribe) {
+      this.routerEventsUnsubscribe();
+      this.routerEventsUnsubscribe = null;
+    }
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    if (window.innerWidth > 1200 && this.isBurgerMenuOpen) {
+      this.closeBurgerMenu();
+    }
+  }
+
+  public toggleBurgerMenu(): void {
+    this.isBurgerMenuOpen = !this.isBurgerMenuOpen;
+  }
+
+  public closeBurgerMenu(): void {
+    this.isBurgerMenuOpen = false;
   }
 
   public getProfileRoute(): string {
@@ -169,10 +239,11 @@ export class Navbar implements OnInit, OnDestroy {
   }
 
   public async logout(): Promise<void> {
-    try{
+    try {
       await this.authService.logout();
+      this.closeBurgerMenu();
       await this.router.navigate(['/login']);
-    }catch (error) {
+    } catch (error) {
       console.error('Logout failed:', error);
     }
   }

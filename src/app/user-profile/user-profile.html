@@ -26,7 +26,7 @@
 
       <li class="divider"></li>
 
-      <li><a href="javascript:void(0)" (click)="optionShowWatchlist()">Watchlist (Movies)</a></li>
+      <li><a href="javascript:void(0)" (click)="optionShowWatchlist()">Watchlist</a></li>
       <li><a href="javascript:void(0)" (click)="optionShowFavorites()">Favorites</a></li>
       <li><a href="javascript:void(0)" (click)="optionShowFriends()">Friends</a></li>
       <li><a href="javascript:void(0)" (click)="optionShowMyReviews()">Reviews</a></li>
@@ -116,24 +116,68 @@
     </div>
 
     <div *ngIf="isShowWatchlist" class="panel outline-box">
-      <h2>Watchlist (Movies)</h2>
+      <div class="panel-title-row">
+        <h2 class="panel-title">Watchlist</h2>
+        <span class="panel-chip">Movies and series</span>
+      </div>
 
-      <div class="list-container outline-box">
-        <div class="list-row list-header">
-          <div class="col col-main">Movie</div>
-          <div class="col col-meta">Added</div>
-        </div>
+      <div class="two-col watchlist-two-col">
+        <div class="sub-panel outline-box">
+          <h3>Watchlist Movies</h3>
 
-        <div class="list-row" *ngFor="let m of watchlistMovies">
-          <div class="col col-main">
-            <div class="title">{{ m?.title || m?.movieId || 'Unknown' }}</div>
-            <div class="sub">{{ m?.movieId ? ('ID: ' + m.movieId) : '' }}</div>
+          <div class="watchlist-card-list">
+            <div class="watchlist-card outline-box" *ngFor="let m of watchlistMovieDetails">
+              <div class="watchlist-poster-wrap">
+                <img
+                  [src]="getWatchlistPosterOrFallback(m.posterUrl)"
+                  [alt]="m.title || 'Movie poster'"
+                  class="watchlist-poster"
+                />
+              </div>
+
+              <div class="watchlist-info">
+                <div class="watchlist-title">{{ m?.title || m?.movieId || 'Unknown' }}</div>
+                <div class="watchlist-sub">Genres: {{ m?.genresText || 'Unknown' }}</div>
+                <div class="watchlist-sub">Release Date: {{ m?.releaseDate || '—' }}</div>
+                <div class="watchlist-sub">Rating: {{ m?.ratingText || '—' }}</div>
+                <div class="watchlist-sub">ID: {{ m?.movieId || '—' }}</div>
+                <div class="watchlist-sub">Added: {{ m?.createdAt || '—' }}</div>
+              </div>
+            </div>
+
+            <div class="empty outline-box" *ngIf="watchlistMovieDetails.length === 0">
+              No watchlist movies yet.
+            </div>
           </div>
-          <div class="col col-meta">{{ m?.createdAt || '—' }}</div>
         </div>
 
-        <div class="empty" *ngIf="watchlistMovies.length === 0">
-          No watchlist movies yet.
+        <div class="sub-panel outline-box">
+          <h3>Watchlist Series</h3>
+
+          <div class="watchlist-card-list">
+            <div class="watchlist-card outline-box" *ngFor="let s of watchlistSeriesDetails">
+              <div class="watchlist-poster-wrap">
+                <img
+                  [src]="getWatchlistPosterOrFallback(s.posterUrl)"
+                  [alt]="s.title || 'Series poster'"
+                  class="watchlist-poster"
+                />
+              </div>
+
+              <div class="watchlist-info">
+                <div class="watchlist-title">{{ s?.title || s?.seriesId || 'Unknown' }}</div>
+                <div class="watchlist-sub">Genres: {{ s?.genresText || 'Unknown' }}</div>
+                <div class="watchlist-sub">First Air Date: {{ s?.releaseDate || '—' }}</div>
+                <div class="watchlist-sub">Rating: {{ s?.ratingText || '—' }}</div>
+                <div class="watchlist-sub">ID: {{ s?.seriesId || '—' }}</div>
+                <div class="watchlist-sub">Added: {{ s?.createdAt || '—' }}</div>
+              </div>
+            </div>
+
+            <div class="empty outline-box" *ngIf="watchlistSeriesDetails.length === 0">
+              No watchlist series yet.
+            </div>
+          </div>
         </div>
       </div>
     </div>

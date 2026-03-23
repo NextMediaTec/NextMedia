@@ -1,0 +1,230 @@
+:host {
+  display: block;
+  margin-top: 24px;
+}
+
+.reviews-section {
+  display: grid;
+  gap: 20px;
+}
+
+.reviews-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(18, 18, 22, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(10px);
+}
+
+.reviews-title {
+  margin: 0;
+  font-size: 24px;
+  color: #ffffff;
+}
+
+.reviews-subtitle {
+  margin-top: 6px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.66);
+}
+
+.rating-summary-card {
+  min-width: 180px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(26, 26, 32, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  text-align: right;
+}
+
+.rating-summary-label {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.56);
+}
+
+.rating-summary-value {
+  margin-top: 8px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.rating-summary-count {
+  margin-top: 6px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.review-create-card,
+.reviews-list-card {
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(18, 18, 22, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(10px);
+}
+
+.review-create-title,
+.review-list-title {
+  margin-bottom: 16px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.login-warning {
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: rgba(255, 170, 170, 0.9);
+}
+
+.rating-picker {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.star-button {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 22px;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.star-button.active {
+  background: rgba(255, 205, 92, 0.2);
+  border-color: rgba(255, 205, 92, 0.5);
+  color: #ffd76a;
+}
+
+.star-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.star-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.review-textarea {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  box-sizing: border-box;
+  outline: none;
+  margin-bottom: 14px;
+}
+
+.review-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.submit-review-button {
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.submit-review-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.review-message {
+  margin-top: 12px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.review-list {
+  display: grid;
+  gap: 14px;
+}
+
+.review-item {
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.review-top-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.review-username {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.review-rating {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffd76a;
+}
+
+.review-date {
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.56);
+}
+
+.review-text {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.92);
+  white-space: pre-wrap;
+}
+
+.review-empty-text {
+  margin-top: 12px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.empty-reviews-box {
+  width: 100%;
+  min-height: 120px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 780px) {
+  .reviews-header {
+    flex-direction: column;
+  }
+
+  .rating-summary-card {
+    width: 100%;
+    text-align: left;
+  }
+}
