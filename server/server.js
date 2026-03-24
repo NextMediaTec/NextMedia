@@ -101,6 +101,111 @@ app.get('/api/tmdb/search/multi', async (req, res) => {
     });
   }
 });
+app.get('/api/tmdb/discover/movie', async (req, res) => {
+  try {
+    const page = String(req.query.page || '1');
+    const language = String(req.query.language || 'en-US');
+    const sortBy = String(req.query.sort_by || 'original_title.asc');
+    const withGenres = String(req.query.with_genres || '').trim();
+
+    const url = new URL(`${TMDB_BASE_URL}/discover/movie`);
+    url.searchParams.set('page', page);
+    url.searchParams.set('language', language);
+    url.searchParams.set('sort_by', sortBy);
+
+    if (withGenres.length > 0) {
+      url.searchParams.set('with_genres', withGenres);
+    }
+
+    const result = await tmdbFetch(url);
+
+    if (!result.ok) {
+      return res.status(result.status).json({
+        success: false,
+        message: 'TMDb returnerede en fejl under discover movie.',
+        tmdb: result.data
+      });
+    }
+
+    const mappedResults = Array.isArray(result.data.results)
+      ? result.data.results.map((item) => {
+          return {
+            ...item,
+            media_type: 'movie'
+          };
+        })
+      : [];
+
+    return res.json({
+      success: true,
+      data: {
+        page: result.data.page || 1,
+        results: mappedResults,
+        total_pages: result.data.total_pages || 0,
+        total_results: result.data.total_results || mappedResults.length
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Serverfejl under discover movie.',
+      error: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+app.get('/api/tmdb/discover/tv', async (req, res) => {
+  try {
+    const page = String(req.query.page || '1');
+    const language = String(req.query.language || 'en-US');
+    const sortBy = String(req.query.sort_by || 'popularity.desc');
+    const withGenres = String(req.query.with_genres || '').trim();
+
+    const url = new URL(`${TMDB_BASE_URL}/discover/tv`);
+    url.searchParams.set('page', page);
+    url.searchParams.set('language', language);
+    url.searchParams.set('sort_by', sortBy);
+
+    if (withGenres.length > 0) {
+      url.searchParams.set('with_genres', withGenres);
+    }
+
+    const result = await tmdbFetch(url);
+
+    if (!result.ok) {
+      return res.status(result.status).json({
+        success: false,
+        message: 'TMDb returnerede en fejl under discover tv.',
+        tmdb: result.data
+      });
+    }
+
+    const mappedResults = Array.isArray(result.data.results)
+      ? result.data.results.map((item) => {
+          return {
+            ...item,
+            media_type: 'tv'
+          };
+        })
+      : [];
+
+    return res.json({
+      success: true,
+      data: {
+        page: result.data.page || 1,
+        results: mappedResults,
+        total_pages: result.data.total_pages || 0,
+        total_results: result.data.total_results || mappedResults.length
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Serverfejl under discover tv.',
+      error: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
 
 app.get('/api/tmdb/discover/:mediaType', async (req, res) => {
   try {
@@ -348,58 +453,7 @@ app.get('/api/tmdb/genre/movie/list', async (req, res) => {
   }
 });
 
-app.get('/api/tmdb/discover/movie', async (req, res) => {
-  try {
-    const page = String(req.query.page || '1');
-    const language = String(req.query.language || 'en-US');
-    const sortBy = String(req.query.sort_by || 'original_title.asc');
-    const withGenres = String(req.query.with_genres || '').trim();
 
-    const url = new URL(`${TMDB_BASE_URL}/discover/movie`);
-    url.searchParams.set('page', page);
-    url.searchParams.set('language', language);
-    url.searchParams.set('sort_by', sortBy);
-
-    if (withGenres.length > 0) {
-      url.searchParams.set('with_genres', withGenres);
-    }
-
-    const result = await tmdbFetch(url);
-
-    if (!result.ok) {
-      return res.status(result.status).json({
-        success: false,
-        message: 'TMDb returnerede en fejl under discover movie.',
-        tmdb: result.data
-      });
-    }
-
-    const mappedResults = Array.isArray(result.data.results)
-      ? result.data.results.map((item) => {
-          return {
-            ...item,
-            media_type: 'movie'
-          };
-        })
-      : [];
-
-    return res.json({
-      success: true,
-      data: {
-        page: result.data.page || 1,
-        results: mappedResults,
-        total_pages: result.data.total_pages || 0,
-        total_results: result.data.total_results || mappedResults.length
-      }
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'Serverfejl under discover movie.',
-      error: error instanceof Error ? error.message : String(error)
-    });
-  }
-});
 
 app.listen(PORT, () => {
   console.log(`Server kører på http://localhost:${PORT}`);

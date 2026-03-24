@@ -10,13 +10,14 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { AdminGuard } from './guards/admin.guard';
 import { Adminpage } from './adminpage/adminpage';
 
+import { PopularMovies } from './popular-movies/popular-movies';
 
 import { BrowseByGenreMovies } from './Components/browse-by-genre-movies/browse-by-genre-movies';
 import { BrowseByGenreSeries } from './Components//browse-by-genre-series/browse-by-genre-series';
 import { CelebsBornToday } from './Components//celebs-born-today/celebs-born-today';
 import { MostPopularCeleb } from './Components//most-popular-celeb/most-popular-celeb';
-import { MostPopularMovies } from './Components//most-popular-movies/most-popular-movies';
-import { MostPopularSeries } from './Components//most-popular-series/most-popular-series';
+import { PopularSeries } from './popular-series/popular-series';
+
 import { ReleaseCalenderMovies } from './Components//release-calender-movies/release-calender-movies';
 import { ReleaseCalenderSeries } from './Components//release-calender-series/release-calender-series';
 import { TopBoxOffice } from './Components//top-box-office/top-box-office';
@@ -36,16 +37,16 @@ export const routes: Route[] = [
     {path: 'profile/:uid', component: UserProfile, canActivate: [AuthGuard]},
     {path: 'forgot-password', component: ForgotPasswordComponent},
     {path: 'admin', component: Adminpage, canActivate: [AdminGuard]},
-
-
+    {path: 'most-popular-movies', component: PopularMovies, canActivate: [AuthGuard]},
+    { path: 'most-popular-series', component: PopularSeries },
 
   { path: 'browse-by-genre-movies', component: BrowseByGenreMovies },
   { path: 'show-genre-movies/:genreId', component: ShowGenreMovies },
   { path: 'browse-by-genre-series', component: BrowseByGenreSeries },
   { path: 'celebs-born-today', component: CelebsBornToday },
   { path: 'most-popular-celeb', component: MostPopularCeleb },
-  { path: 'most-popular-movies', component: MostPopularMovies },
-  { path: 'most-popular-series', component: MostPopularSeries },
+
+
   { path: 'release-calender-movies', component: ReleaseCalenderMovies },
   { path: 'release-calender-series', component: ReleaseCalenderSeries },
   { path: 'top-box-office', component: TopBoxOffice },
