@@ -1,0 +1,55 @@
+<section class="release-calendar-months-page">
+  <div class="release-calendar-months-shell">
+    <div class="page-header">
+      <h1>Movie Release Calendar</h1>
+      <p>Choose a month to see all movies releasing in {{ currentYear }}.</p>
+    </div>
+
+    <section class="top-movies-section" *ngIf="top10Movies.length > 0">
+      <div class="section-header">
+        <h2>Top 10 Movies Releasing in {{ currentYear }}</h2>
+      </div>
+
+      <div class="top-movies-grid">
+        <a
+          class="top-movie-card"
+          *ngFor="let movie of top10Movies; trackBy: trackByTopMovieId"
+          [routerLink]="['/show-movie', 'movie', movie.id]"
+        >
+          <div class="top-movie-poster">
+            <img
+              class="top-movie-poster-image"
+              [src]="getTopMoviePosterSrc(movie)"
+              [alt]="getTopMoviePosterAlt(movie)"
+            />
+          </div>
+
+          <div class="top-movie-content">
+            <h3>{{ tmdbService.getDisplayTitle(movie) }}</h3>
+            <p>{{ getTopMovieReleaseDate(movie) }}</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <div class="months-grid">
+      <a
+        class="month-card"
+        *ngFor="let month of months; trackBy: trackByMonthNumber"
+        [routerLink]="['/release-calender-movies', month.year, month.monthNumber]"
+      >
+        <div class="month-poster">
+          <img
+            class="month-poster-image"
+            [src]="getMonthPosterSrc(month)"
+            [alt]="getMonthPosterAlt(month)"
+          />
+        </div>
+
+        <div class="month-card-content">
+          <h2>{{ month.monthName }}</h2>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>

@@ -193,74 +193,6 @@ app.get('/api/tmdb/search/multi', async (req, res) => {
   }
 });
 
-app.get('/api/tmdb/discover/:mediaType', async (req, res) => {
-  try {
-    const mediaType = String(req.params.mediaType || '').trim();
-    const withGenres = String(req.query.with_genres || '').trim();
-    const page = String(req.query.page || '1');
-    const language = String(req.query.language || 'en-US');
-
-    if (mediaType !== 'movie' && mediaType !== 'tv') {
-      return res.status(400).json({
-        success: false,
-        message: 'mediaType skal være "movie" eller "tv".'
-      });
-    }
-
-    if (withGenres.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Query parameter "with_genres" mangler.'
-      });
-    }
-
-    const url = new URL(`${TMDB_BASE_URL}/discover/${mediaType}`);
-    url.searchParams.set('with_genres', withGenres);
-    url.searchParams.set('page', page);
-    url.searchParams.set('language', language);
-    url.searchParams.set('sort_by', 'popularity.desc');
-
-    const result = await tmdbFetch(url);
-
-    if (!result.ok) {
-      return res.status(result.status).json({
-        success: false,
-        message: 'TMDb returnerede en fejl under discover.',
-        tmdb: result.data
-      });
-    }
-
-    const normalizedResults = Array.isArray(result.data.results)
-      ? result.data.results.map((item) => ({
-          ...item,
-          media_type: mediaType
-        }))
-      : [];
-
-    const filteredResults = normalizedResults.filter((item) => {
-      const hasPoster = !!item.poster_path;
-      const hasBackdrop = !!item.backdrop_path;
-      return hasPoster && hasBackdrop;
-    });
-
-    return res.json({
-      success: true,
-      data: {
-        page: result.data.page || 1,
-        results: filteredResults,
-        total_pages: result.data.total_pages || 0,
-        total_results: result.data.total_results || filteredResults.length
-      }
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'Serverfejl under discover.',
-      error: error instanceof Error ? error.message : String(error)
-    });
-  }
-});
-
 app.get('/api/tmdb/details/:mediaType/:id', async (req, res) => {
   try {
     const mediaType = String(req.params.mediaType || '').trim();
@@ -617,6 +549,10 @@ app.get('/api/tmdb/discover/movie', async (req, res) => {
     const language = String(req.query.language || 'en-US');
     const sortBy = String(req.query.sort_by || 'original_title.asc');
     const withGenres = String(req.query.with_genres || '').trim();
+    const releaseDateLte = String(req.query['release_date.lte'] || '').trim();
+    const releaseDateGte = String(req.query['release_date.gte'] || '').trim();
+    const voteCountGte = String(req.query['vote_count.gte'] || '').trim();
+    const region = String(req.query.region || '').trim();
 
     const url = new URL(`${TMDB_BASE_URL}/discover/movie`);
     url.searchParams.set('page', page);
@@ -625,6 +561,22 @@ app.get('/api/tmdb/discover/movie', async (req, res) => {
 
     if (withGenres.length > 0) {
       url.searchParams.set('with_genres', withGenres);
+    }
+
+    if (releaseDateLte.length > 0) {
+      url.searchParams.set('release_date.lte', releaseDateLte);
+    }
+
+    if (releaseDateGte.length > 0) {
+      url.searchParams.set('release_date.gte', releaseDateGte);
+    }
+
+    if (voteCountGte.length > 0) {
+      url.searchParams.set('vote_count.gte', voteCountGte);
+    }
+
+    if (region.length > 0) {
+      url.searchParams.set('region', region);
     }
 
     const result = await tmdbFetch(url);
@@ -732,6 +684,74 @@ app.get('/api/tmdb/discover/tv', async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Serverfejl under discover tv.',
+      error: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+app.get('/api/tmdb/discover/:mediaType', async (req, res) => {
+  try {
+    const mediaType = String(req.params.mediaType || '').trim();
+    const withGenres = String(req.query.with_genres || '').trim();
+    const page = String(req.query.page || '1');
+    const language = String(req.query.language || 'en-US');
+
+    if (mediaType !== 'movie' && mediaType !== 'tv') {
+      return res.status(400).json({
+        success: false,
+        message: 'mediaType skal være "movie" eller "tv".'
+      });
+    }
+
+    if (withGenres.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Query parameter "with_genres" mangler.'
+      });
+    }
+
+    const url = new URL(`${TMDB_BASE_URL}/discover/${mediaType}`);
+    url.searchParams.set('with_genres', withGenres);
+    url.searchParams.set('page', page);
+    url.searchParams.set('language', language);
+    url.searchParams.set('sort_by', 'popularity.desc');
+
+    const result = await tmdbFetch(url);
+
+    if (!result.ok) {
+      return res.status(result.status).json({
+        success: false,
+        message: 'TMDb returnerede en fejl under discover.',
+        tmdb: result.data
+      });
+    }
+
+    const normalizedResults = Array.isArray(result.data.results)
+      ? result.data.results.map((item) => ({
+          ...item,
+          media_type: mediaType
+        }))
+      : [];
+
+    const filteredResults = normalizedResults.filter((item) => {
+      const hasPoster = !!item.poster_path;
+      const hasBackdrop = !!item.backdrop_path;
+      return hasPoster && hasBackdrop;
+    });
+
+    return res.json({
+      success: true,
+      data: {
+        page: result.data.page || 1,
+        results: filteredResults,
+        total_pages: result.data.total_pages || 0,
+        total_results: result.data.total_results || filteredResults.length
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Serverfejl under discover.',
       error: error instanceof Error ? error.message : String(error)
     });
   }

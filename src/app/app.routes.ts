@@ -24,6 +24,8 @@ import { Top250Series } from './Components//top250-series/top250-series';
 import { ShowGenreMovies } from './Components/show-genre-movies/show-genre-movies';
 import { ShowGenreSeries } from './Components/show-genre-series/show-genre-series';
 import { ShowCeleb } from './Components/show-celeb/show-celeb';
+import { ShowReleaseCalenderMonths } from './Components/show-release-calender-months/show-release-calender-months';
+import { ShowReleaseCalenderMonthsSeries } from './Components/show-release-calender-months-series/show-release-calender-months-series';
 
 export const routes: Route[] = [
   { path: 'show-movie/:mediaType/:id', component: ShowMovieComponent },
@@ -45,8 +47,12 @@ export const routes: Route[] = [
   { path: 'most-popular-celeb', component: MostPopularCeleb },
   { path: 'most-popular-movies', component: MostPopularMovies },
   { path: 'most-popular-series', component: MostPopularSeries },
+  { path: 'show-release-calender-months', component: ShowReleaseCalenderMonths },
+  { path: 'show-release-calender-months-series', component: ShowReleaseCalenderMonthsSeries },
   { path: 'release-calender-movies', component: ReleaseCalenderMovies },
+  { path: 'release-calender-movies/:year/:month', component: ReleaseCalenderMovies },
   { path: 'release-calender-series', component: ReleaseCalenderSeries },
+  { path: 'release-calender-series/:year/:month', component: ReleaseCalenderSeries },
   { path: 'top-box-office', component: TopBoxOffice },
   { path: 'top250-movies', component: Top250Movies },
   { path: 'top250-series', component: Top250Series },

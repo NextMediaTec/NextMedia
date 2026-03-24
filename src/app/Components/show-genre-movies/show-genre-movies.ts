@@ -11,7 +11,7 @@ import {
   TmdbService
 } from '../../services/tmdb.service';
 import { MediaRatingSummary, ReviewsService } from '../../services/reviews.service';
-import { WatchlistButtonComponent } from '../../watchlist-button/watchlist-button';
+import { WatchlistButtonComponent } from '../../Watchlist/watchlist-button/watchlist-button';
 
 interface RatedGenreMovie extends TmdbSearchMultiResult {
   ownAverageRating: number;

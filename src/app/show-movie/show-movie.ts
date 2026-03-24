@@ -17,7 +17,7 @@ import {
 } from '../services/tmdb.service';
 import { ReviewsService } from '../services/reviews.service';
 import { ReviewsComponent } from '../reviews/reviews';
-import { WatchlistButtonComponent } from '../watchlist-button/watchlist-button';
+import { WatchlistButtonComponent } from '../Watchlist/watchlist-button/watchlist-button';
 
 @Component({
   selector: 'app-show-movie',

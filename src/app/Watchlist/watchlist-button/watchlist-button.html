@@ -1,0 +1,44 @@
+<div class="watchlist-button-wrapper">
+  <div class="custom-watchlist-controls" *ngIf="hasLoadedLists">
+    <label class="custom-watchlist-label" for="customWatchlistSelect">
+      Choose custom watchlist
+    </label>
+
+    <select
+      id="customWatchlistSelect"
+      class="custom-watchlist-select"
+      [disabled]="loading || availableCustomWatchlists.length === 0"
+      [value]="selectedCustomWatchlistId"
+      (change)="updateSelectedCustomWatchlist($event)"
+    >
+      <option value="">Select custom watchlist</option>
+
+      <option
+        *ngFor="let list of availableCustomWatchlists"
+        [value]="list.listId"
+      >
+        {{ list.name }}
+      </option>
+    </select>
+  </div>
+
+  <button
+    type="button"
+    class="watchlist-button"
+    [class.in-watchlist]="isInSelectedCustomWatchlist"
+    [disabled]="loading || availableCustomWatchlists.length === 0 || !selectedCustomWatchlistId"
+    (click)="toggleWatchlist($event)"
+  >
+    <span *ngIf="!loading && !isInSelectedCustomWatchlist">Add to selected custom watchlist</span>
+    <span *ngIf="!loading && isInSelectedCustomWatchlist">Remove from selected custom watchlist</span>
+    <span *ngIf="loading">Loading...</span>
+  </button>
+
+  <div
+    class="watchlist-message"
+    [class.error]="isError"
+    *ngIf="message"
+  >
+    {{ message }}
+  </div>
+</div>

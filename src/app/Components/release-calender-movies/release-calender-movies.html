@@ -1,1 +1,56 @@
-<p>release-calender-movies works!</p>
+<section class="release-calendar-movies-page">
+  <div class="release-calendar-movies-shell">
+    <div class="page-header">
+      <div class="page-header-top">
+        <a class="back-link" routerLink="/show-release-calender-months">Back to months</a>
+      </div>
+
+      <h1>{{ selectedMonthName }} {{ selectedYear }}</h1>
+      <p>
+        Showing movies with release dates from {{ dateFrom }} to {{ dateTo }}.
+      </p>
+    </div>
+
+    <div class="status-row" *ngIf="isLoading">
+      <p>Loading movies...</p>
+    </div>
+
+    <div class="status-row error" *ngIf="hasError && !isLoading">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <div class="results-summary" *ngIf="!isLoading && !hasError">
+      <p>{{ movies.length }} movies found.</p>
+    </div>
+
+    <div class="movies-grid" *ngIf="!isLoading && !hasError && movies.length > 0">
+      <a
+        class="movie-card"
+        *ngFor="let movie of movies; trackBy: trackByMovieId"
+        [routerLink]="['/show-movie', 'movie', movie.id]"
+      >
+        <div class="movie-poster">
+          <img
+            *ngIf="movie.poster_path; else noPoster"
+            [src]="tmdbService.getPosterUrl(movie.poster_path, 'w500')"
+            [alt]="getMovieTitle(movie)"
+          />
+
+          <ng-template #noPoster>
+            <div class="no-poster">No image</div>
+          </ng-template>
+        </div>
+
+        <div class="movie-content">
+          <h2>{{ getMovieTitle(movie) }}</h2>
+          <p class="release-date">{{ movie.release_date || 'No release date' }}</p>
+          <p class="overview" *ngIf="movie.overview">{{ movie.overview }}</p>
+        </div>
+      </a>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && !hasError && movies.length === 0">
+      <p>No movies were found for this month.</p>
+    </div>
+  </div>
+</section>

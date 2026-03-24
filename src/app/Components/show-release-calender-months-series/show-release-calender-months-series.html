@@ -1,0 +1,55 @@
+<section class="release-calendar-months-page">
+  <div class="release-calendar-months-shell">
+    <div class="page-header">
+      <h1>Series Release Calendar</h1>
+      <p>Choose a month to see all series releasing in {{ currentYear }}.</p>
+    </div>
+
+    <section class="top-series-section" *ngIf="top10Series.length > 0">
+      <div class="section-header">
+        <h2>Top 10 Series Releasing in {{ currentYear }}</h2>
+      </div>
+
+      <div class="top-series-grid">
+        <a
+          class="top-series-card"
+          *ngFor="let series of top10Series; trackBy: trackByTopSeriesId"
+          [routerLink]="['/show-movie', 'tv', series.id]"
+        >
+          <div class="top-series-poster">
+            <img
+              class="top-series-poster-image"
+              [src]="getTopSeriesPosterSrc(series)"
+              [alt]="getTopSeriesPosterAlt(series)"
+            />
+          </div>
+
+          <div class="top-series-content">
+            <h3>{{ tmdbService.getDisplayTitle(series) }}</h3>
+            <p>{{ getTopSeriesReleaseDate(series) }}</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <div class="months-grid">
+      <a
+        class="month-card"
+        *ngFor="let month of months; trackBy: trackByMonthNumber"
+        [routerLink]="['/release-calender-series', month.year, month.monthNumber]"
+      >
+        <div class="month-poster">
+          <img
+            class="month-poster-image"
+            [src]="getMonthPosterSrc(month)"
+            [alt]="getMonthPosterAlt(month)"
+          />
+        </div>
+
+        <div class="month-card-content">
+          <h2>{{ month.monthName }}</h2>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>

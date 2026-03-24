@@ -1,1 +1,56 @@
-<p>release-calender-series works!</p>
+<section class="release-calendar-series-page">
+  <div class="release-calendar-series-shell">
+    <div class="page-header">
+      <div class="page-header-top">
+        <a class="back-link" routerLink="/show-release-calender-months-series">Back to months</a>
+      </div>
+
+      <h1>{{ selectedMonthName }} {{ selectedYear }}</h1>
+      <p>
+        Showing series with first air dates from {{ dateFrom }} to {{ dateTo }}.
+      </p>
+    </div>
+
+    <div class="status-row" *ngIf="isLoading">
+      <p>Loading series...</p>
+    </div>
+
+    <div class="status-row error" *ngIf="hasError && !isLoading">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <div class="results-summary" *ngIf="!isLoading && !hasError">
+      <p>{{ series.length }} series found.</p>
+    </div>
+
+    <div class="series-grid" *ngIf="!isLoading && !hasError && series.length > 0">
+      <a
+        class="series-card"
+        *ngFor="let item of series; trackBy: trackBySeriesId"
+        [routerLink]="['/show-movie', 'tv', item.id]"
+      >
+        <div class="series-poster">
+          <img
+            *ngIf="item.poster_path; else noPoster"
+            [src]="tmdbService.getPosterUrl(item.poster_path, 'w500')"
+            [alt]="getSeriesTitle(item)"
+          />
+
+          <ng-template #noPoster>
+            <div class="no-poster">No image</div>
+          </ng-template>
+        </div>
+
+        <div class="series-content">
+          <h2>{{ getSeriesTitle(item) }}</h2>
+          <p class="release-date">{{ item.first_air_date || 'No first air date' }}</p>
+          <p class="overview" *ngIf="item.overview">{{ item.overview }}</p>
+        </div>
+      </a>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && !hasError && series.length === 0">
+      <p>No series were found for this month.</p>
+    </div>
+  </div>
+</section>
