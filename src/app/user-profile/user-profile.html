@@ -116,70 +116,7 @@
     </div>
 
     <div *ngIf="isShowWatchlist" class="panel outline-box">
-      <div class="panel-title-row">
-        <h2 class="panel-title">Watchlist</h2>
-        <span class="panel-chip">Movies and series</span>
-      </div>
-
-      <div class="two-col watchlist-two-col">
-        <div class="sub-panel outline-box">
-          <h3>Watchlist Movies</h3>
-
-          <div class="watchlist-card-list">
-            <div class="watchlist-card outline-box" *ngFor="let m of watchlistMovieDetails">
-              <div class="watchlist-poster-wrap">
-                <img
-                  [src]="getWatchlistPosterOrFallback(m.posterUrl)"
-                  [alt]="m.title || 'Movie poster'"
-                  class="watchlist-poster"
-                />
-              </div>
-
-              <div class="watchlist-info">
-                <div class="watchlist-title">{{ m?.title || m?.movieId || 'Unknown' }}</div>
-                <div class="watchlist-sub">Genres: {{ m?.genresText || 'Unknown' }}</div>
-                <div class="watchlist-sub">Release Date: {{ m?.releaseDate || '—' }}</div>
-                <div class="watchlist-sub">Rating: {{ m?.ratingText || '—' }}</div>
-                <div class="watchlist-sub">ID: {{ m?.movieId || '—' }}</div>
-                <div class="watchlist-sub">Added: {{ m?.createdAt || '—' }}</div>
-              </div>
-            </div>
-
-            <div class="empty outline-box" *ngIf="watchlistMovieDetails.length === 0">
-              No watchlist movies yet.
-            </div>
-          </div>
-        </div>
-
-        <div class="sub-panel outline-box">
-          <h3>Watchlist Series</h3>
-
-          <div class="watchlist-card-list">
-            <div class="watchlist-card outline-box" *ngFor="let s of watchlistSeriesDetails">
-              <div class="watchlist-poster-wrap">
-                <img
-                  [src]="getWatchlistPosterOrFallback(s.posterUrl)"
-                  [alt]="s.title || 'Series poster'"
-                  class="watchlist-poster"
-                />
-              </div>
-
-              <div class="watchlist-info">
-                <div class="watchlist-title">{{ s?.title || s?.seriesId || 'Unknown' }}</div>
-                <div class="watchlist-sub">Genres: {{ s?.genresText || 'Unknown' }}</div>
-                <div class="watchlist-sub">First Air Date: {{ s?.releaseDate || '—' }}</div>
-                <div class="watchlist-sub">Rating: {{ s?.ratingText || '—' }}</div>
-                <div class="watchlist-sub">ID: {{ s?.seriesId || '—' }}</div>
-                <div class="watchlist-sub">Added: {{ s?.createdAt || '—' }}</div>
-              </div>
-            </div>
-
-            <div class="empty outline-box" *ngIf="watchlistSeriesDetails.length === 0">
-              No watchlist series yet.
-            </div>
-          </div>
-        </div>
-      </div>
+      <app-user-watchlist [viewedUid]="viewedUid"></app-user-watchlist>
     </div>
 
     <div *ngIf="isShowFavorites" class="panel outline-box">

@@ -1,1 +1,49 @@
-<p>browse-by-genre-series works!</p>
+<section class="browse-series-page">
+  <div class="browse-page-shell">
+    <div class="browse-header">
+      <h1>Browse Series by Genre</h1>
+      <p>Vælg en genre for at åbne genre-siden med populære, seneste og bedst ratede serier.</p>
+    </div>
+
+    <div class="status-row" *ngIf="isLoadingGenres || isLoadingCards">
+      <p>Henter genre-sider...</p>
+    </div>
+
+    <div class="status-row error" *ngIf="hasError">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <div class="genre-grid" *ngIf="!hasError">
+      <button
+        type="button"
+        class="genre-card"
+        *ngFor="let card of genreCards; trackBy: trackByGenreId"
+        (click)="openGenre(card.genreId)"
+      >
+        <div class="genre-card-image">
+          <img
+            *ngIf="card.imagePath || card.backdropPath; else noGenreImage"
+            [src]="getCardImage(card)"
+            [alt]="card.genreName"
+          />
+
+          <ng-template #noGenreImage>
+            <div class="no-genre-image">No Image</div>
+          </ng-template>
+        </div>
+
+        <div class="genre-card-overlay">
+          <div class="genre-card-title-row">
+            <h2>{{ card.genreName }}</h2>
+          </div>
+
+          <p *ngIf="card.sampleSeriesTitle">{{ card.sampleSeriesTitle }}</p>
+        </div>
+      </button>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoadingGenres && !isLoadingCards && !hasError && genreCards.length === 0">
+      <p>Ingen genrer kunne vises.</p>
+    </div>
+  </div>
+</section>

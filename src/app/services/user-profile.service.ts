@@ -18,7 +18,8 @@ import {
   set,
   remove,
   onValue,
-  Unsubscribe
+  Unsubscribe,
+  push
 } from 'firebase/database';
 
 export interface UserProfileData {
@@ -33,6 +34,25 @@ export interface FriendRequestWriteResult {
   toUid: string;
   createdAt: string;
   status: string;
+}
+
+export type CustomWatchlistMediaType = 'movie' | 'tv' | 'both';
+export type CustomWatchlistItemMediaType = 'movie' | 'tv';
+
+export interface CustomWatchlistData {
+  listId: string;
+  name: string;
+  mediaType: CustomWatchlistMediaType;
+  genreId: number | null;
+  genreName: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CustomWatchlistItemData {
+  mediaType: CustomWatchlistItemMediaType;
+  mediaId: number;
+  createdAt: string;
 }
 
 @Injectable({
@@ -191,6 +211,7 @@ export class UserProfileService {
     await this.ensurePathObjectExists(`users/${uid}/favoriteSeries`);
     await this.ensurePathObjectExists(`users/${uid}/movieReviews`);
     await this.ensurePathObjectExists(`users/${uid}/seriesReviews`);
+    await this.ensurePathObjectExists(`users/${uid}/customWatchlists`);
   }
 
   private async ensurePathObjectExists(path: string): Promise<void> {
@@ -603,6 +624,343 @@ export class UserProfileService {
     return await this.readKeyedListAsArray(`users/${safeUid}/seriesReviews`, 'seriesId');
   }
 
+  public async createMyCustomWatchlist(
+    name: string,
+    mediaType: CustomWatchlistMediaType,
+    genreId: number | null,
+    genreName: string | null
+  ): Promise<string> {
+    const user = this.requireUser();
+    const uid = user.uid;
+
+    const safeName = (name || '').trim();
+    if (safeName.length === 0) {
+      throw new Error('List name is required.');
+    }
+
+    const safeMediaType = this.normalizeCustomWatchlistMediaType(mediaType);
+    const safeGenreId = typeof genreId === 'number' && !Number.isNaN(genreId) ? genreId : null;
+    const safeGenreName = (genreName || '').trim().length > 0 ? (genreName || '').trim() : null;
+
+    const listsRef = ref(this.firebase.db, `users/${uid}/customWatchlists`);
+    const newListRef = push(listsRef);
+
+    if (!newListRef.key) {
+      throw new Error('Could not create list id.');
+    }
+
+    const now = new Date().toISOString();
+
+    await set(newListRef, {
+      listId: newListRef.key,
+      name: safeName,
+      mediaType: safeMediaType,
+      genreId: safeGenreId,
+      genreName: safeGenreName,
+      createdAt: now,
+      updatedAt: now,
+      items: {
+        movie: {},
+        tv: {}
+      }
+    });
+
+    return newListRef.key;
+  }
+
+  public async updateMyCustomWatchlistMeta(
+    listId: string,
+    name: string,
+    mediaType: CustomWatchlistMediaType,
+    genreId: number | null,
+    genreName: string | null
+  ): Promise<void> {
+    const user = this.requireUser();
+    const uid = user.uid;
+
+    const safeListId = (listId || '').trim();
+    if (safeListId.length === 0) {
+      throw new Error('List id is required.');
+    }
+
+    const safeName = (name || '').trim();
+    if (safeName.length === 0) {
+      throw new Error('List name is required.');
+    }
+
+    const safeMediaType = this.normalizeCustomWatchlistMediaType(mediaType);
+    const safeGenreId = typeof genreId === 'number' && !Number.isNaN(genreId) ? genreId : null;
+    const safeGenreName = (genreName || '').trim().length > 0 ? (genreName || '').trim() : null;
+
+    const listRef = ref(this.firebase.db, `users/${uid}/customWatchlists/${safeListId}`);
+    const snap: DataSnapshot = await get(listRef);
+
+    if (!snap.exists()) {
+      throw new Error('List not found.');
+    }
+
+    await update(listRef, {
+      name: safeName,
+      mediaType: safeMediaType,
+      genreId: safeGenreId,
+      genreName: safeGenreName,
+      updatedAt: new Date().toISOString()
+    });
+  }
+
+  public async deleteMyCustomWatchlist(listId: string): Promise<void> {
+    const user = this.requireUser();
+    const uid = user.uid;
+
+    const safeListId = (listId || '').trim();
+    if (safeListId.length === 0) {
+      return;
+    }
+
+    await remove(ref(this.firebase.db, `users/${uid}/customWatchlists/${safeListId}`));
+  }
+
+  public async getMyCustomWatchlists(): Promise<CustomWatchlistData[]> {
+    const user = this.requireUser();
+    return await this.readCustomWatchlistsAsArray(`users/${user.uid}/customWatchlists`);
+  }
+
+  public async getUserCustomWatchlistsByUid(uid: string): Promise<CustomWatchlistData[]> {
+    const safeUid = (uid || '').trim();
+    if (safeUid.length === 0) return [];
+    return await this.readCustomWatchlistsAsArray(`users/${safeUid}/customWatchlists`);
+  }
+
+  public async addItemToMyCustomWatchlist(
+    listId: string,
+    mediaType: CustomWatchlistItemMediaType,
+    mediaId: number
+  ): Promise<void> {
+    const user = this.requireUser();
+    const uid = user.uid;
+
+    const safeListId = (listId || '').trim();
+    if (safeListId.length === 0) {
+      throw new Error('List id is required.');
+    }
+
+    const safeMediaType = this.normalizeCustomWatchlistItemMediaType(mediaType);
+    const safeMediaId = Number(mediaId);
+
+    if (!safeMediaId) {
+      throw new Error('Media id is required.');
+    }
+
+    const listRef = ref(this.firebase.db, `users/${uid}/customWatchlists/${safeListId}`);
+    const listSnap: DataSnapshot = await get(listRef);
+
+    if (!listSnap.exists()) {
+      throw new Error('List not found.');
+    }
+
+    const listData = listSnap.val();
+    const listMediaType = this.normalizeCustomWatchlistMediaType(listData?.mediaType);
+
+    if (listMediaType !== 'both' && listMediaType !== safeMediaType) {
+      throw new Error('This list does not allow that media type.');
+    }
+
+    const itemPath = `users/${uid}/customWatchlists/${safeListId}/items/${safeMediaType}/${safeMediaId}`;
+
+    await set(ref(this.firebase.db, itemPath), {
+      mediaType: safeMediaType,
+      mediaId: safeMediaId,
+      createdAt: new Date().toISOString()
+    });
+
+    await update(listRef, {
+      updatedAt: new Date().toISOString()
+    });
+  }
+
+  public async removeItemFromMyCustomWatchlist(
+    listId: string,
+    mediaType: CustomWatchlistItemMediaType,
+    mediaId: number
+  ): Promise<void> {
+    const user = this.requireUser();
+    const uid = user.uid;
+
+    const safeListId = (listId || '').trim();
+    if (safeListId.length === 0) {
+      return;
+    }
+
+    const safeMediaType = this.normalizeCustomWatchlistItemMediaType(mediaType);
+    const safeMediaId = Number(mediaId);
+
+    if (!safeMediaId) {
+      return;
+    }
+
+    const itemPath = `users/${uid}/customWatchlists/${safeListId}/items/${safeMediaType}/${safeMediaId}`;
+    await remove(ref(this.firebase.db, itemPath));
+
+    await update(ref(this.firebase.db, `users/${uid}/customWatchlists/${safeListId}`), {
+      updatedAt: new Date().toISOString()
+    });
+  }
+
+  public async getMyCustomWatchlistItems(
+    listId: string,
+    mediaType: CustomWatchlistItemMediaType
+  ): Promise<CustomWatchlistItemData[]> {
+    const user = this.requireUser();
+    const uid = user.uid;
+
+    const safeListId = (listId || '').trim();
+    if (safeListId.length === 0) return [];
+
+    const safeMediaType = this.normalizeCustomWatchlistItemMediaType(mediaType);
+
+    return await this.readCustomWatchlistItemsAsArray(
+      `users/${uid}/customWatchlists/${safeListId}/items/${safeMediaType}`,
+      safeMediaType
+    );
+  }
+
+  public async getUserCustomWatchlistItemsByUid(
+    uid: string,
+    listId: string,
+    mediaType: CustomWatchlistItemMediaType
+  ): Promise<CustomWatchlistItemData[]> {
+    const safeUid = (uid || '').trim();
+    const safeListId = (listId || '').trim();
+
+    if (safeUid.length === 0) return [];
+    if (safeListId.length === 0) return [];
+
+    const safeMediaType = this.normalizeCustomWatchlistItemMediaType(mediaType);
+
+    return await this.readCustomWatchlistItemsAsArray(
+      `users/${safeUid}/customWatchlists/${safeListId}/items/${safeMediaType}`,
+      safeMediaType
+    );
+  }
+
+  public subscribeUserCustomWatchlists(uid: string, onItems: (items: CustomWatchlistData[]) => void): Unsubscribe {
+    const safeUid = (uid || '').trim();
+    const r = ref(this.firebase.db, `users/${safeUid}/customWatchlists`);
+
+    const unsub = onValue(r, (snap: DataSnapshot) => {
+      if (!snap.exists()) {
+        onItems([]);
+        return;
+      }
+
+      const data = snap.val();
+      if (typeof data !== 'object' || data === null) {
+        onItems([]);
+        return;
+      }
+
+      const keys = Object.keys(data);
+      const out: CustomWatchlistData[] = [];
+
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        const v = data[k];
+
+        if (typeof v !== 'object' || v === null) {
+          continue;
+        }
+
+        out.push({
+          listId: (v?.listId || k),
+          name: typeof v?.name === 'string' && v.name.trim().length > 0 ? v.name : 'Untitled List',
+          mediaType: this.normalizeCustomWatchlistMediaType(v?.mediaType),
+          genreId: typeof v?.genreId === 'number' && !Number.isNaN(v.genreId) ? v.genreId : null,
+          genreName: typeof v?.genreName === 'string' && v.genreName.trim().length > 0 ? v.genreName : null,
+          createdAt: typeof v?.createdAt === 'string' ? v.createdAt : '',
+          updatedAt: typeof v?.updatedAt === 'string' ? v.updatedAt : ''
+        });
+      }
+
+      out.sort((a, b) => {
+        const at = (a?.createdAt || '');
+        const bt = (b?.createdAt || '');
+        if (at < bt) return 1;
+        if (at > bt) return -1;
+        return 0;
+      });
+
+      onItems(out);
+    });
+
+    return unsub;
+  }
+
+  public subscribeUserCustomWatchlistItems(
+    uid: string,
+    listId: string,
+    mediaType: CustomWatchlistItemMediaType,
+    onItems: (items: CustomWatchlistItemData[]) => void
+  ): Unsubscribe {
+    const safeUid = (uid || '').trim();
+    const safeListId = (listId || '').trim();
+    const safeMediaType = this.normalizeCustomWatchlistItemMediaType(mediaType);
+
+    const r = ref(this.firebase.db, `users/${safeUid}/customWatchlists/${safeListId}/items/${safeMediaType}`);
+
+    const unsub = onValue(r, (snap: DataSnapshot) => {
+      if (!snap.exists()) {
+        onItems([]);
+        return;
+      }
+
+      const data = snap.val();
+      if (typeof data !== 'object' || data === null) {
+        onItems([]);
+        return;
+      }
+
+      const keys = Object.keys(data);
+      const out: CustomWatchlistItemData[] = [];
+
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        const v = data[k];
+
+        if (v === true) {
+          out.push({
+            mediaType: safeMediaType,
+            mediaId: Number(k),
+            createdAt: ''
+          });
+        } else if (typeof v === 'object' && v !== null) {
+          out.push({
+            mediaType: this.normalizeCustomWatchlistItemMediaType(v?.mediaType || safeMediaType),
+            mediaId: Number(v?.mediaId || k),
+            createdAt: typeof v?.createdAt === 'string' ? v.createdAt : ''
+          });
+        } else {
+          out.push({
+            mediaType: safeMediaType,
+            mediaId: Number(k),
+            createdAt: ''
+          });
+        }
+      }
+
+      out.sort((a, b) => {
+        const at = (a?.createdAt || '');
+        const bt = (b?.createdAt || '');
+        if (at < bt) return 1;
+        if (at > bt) return -1;
+        return 0;
+      });
+
+      onItems(out.filter(item => !!item.mediaId));
+    });
+
+    return unsub;
+  }
+
   private async readKeyedListAsArray(path: string, idFieldName: string): Promise<any[]> {
     const r = ref(this.firebase.db, path);
     const snap: DataSnapshot = await get(r);
@@ -645,6 +1003,110 @@ export class UserProfileService {
     });
 
     return out;
+  }
+
+  private async readCustomWatchlistsAsArray(path: string): Promise<CustomWatchlistData[]> {
+    const r = ref(this.firebase.db, path);
+    const snap: DataSnapshot = await get(r);
+
+    if (!snap.exists()) return [];
+
+    const data = snap.val();
+    if (typeof data !== 'object' || data === null) return [];
+
+    const keys = Object.keys(data);
+    const out: CustomWatchlistData[] = [];
+
+    for (let i = 0; i < keys.length; i++) {
+      const k = keys[i];
+      const v = data[k];
+
+      if (typeof v !== 'object' || v === null) {
+        continue;
+      }
+
+      out.push({
+        listId: (v?.listId || k),
+        name: typeof v?.name === 'string' && v.name.trim().length > 0 ? v.name : 'Untitled List',
+        mediaType: this.normalizeCustomWatchlistMediaType(v?.mediaType),
+        genreId: typeof v?.genreId === 'number' && !Number.isNaN(v.genreId) ? v.genreId : null,
+        genreName: typeof v?.genreName === 'string' && v.genreName.trim().length > 0 ? v.genreName : null,
+        createdAt: typeof v?.createdAt === 'string' ? v.createdAt : '',
+        updatedAt: typeof v?.updatedAt === 'string' ? v.updatedAt : ''
+      });
+    }
+
+    out.sort((a, b) => {
+      const at = (a?.createdAt || '');
+      const bt = (b?.createdAt || '');
+      if (at < bt) return 1;
+      if (at > bt) return -1;
+      return 0;
+    });
+
+    return out;
+  }
+
+  private async readCustomWatchlistItemsAsArray(
+    path: string,
+    mediaType: CustomWatchlistItemMediaType
+  ): Promise<CustomWatchlistItemData[]> {
+    const r = ref(this.firebase.db, path);
+    const snap: DataSnapshot = await get(r);
+
+    if (!snap.exists()) return [];
+
+    const data = snap.val();
+    if (typeof data !== 'object' || data === null) return [];
+
+    const keys = Object.keys(data);
+    const out: CustomWatchlistItemData[] = [];
+
+    for (let i = 0; i < keys.length; i++) {
+      const k = keys[i];
+      const v = data[k];
+
+      if (v === true) {
+        out.push({
+          mediaType: mediaType,
+          mediaId: Number(k),
+          createdAt: ''
+        });
+      } else if (typeof v === 'object' && v !== null) {
+        out.push({
+          mediaType: this.normalizeCustomWatchlistItemMediaType(v?.mediaType || mediaType),
+          mediaId: Number(v?.mediaId || k),
+          createdAt: typeof v?.createdAt === 'string' ? v.createdAt : ''
+        });
+      } else {
+        out.push({
+          mediaType: mediaType,
+          mediaId: Number(k),
+          createdAt: ''
+        });
+      }
+    }
+
+    out.sort((a, b) => {
+      const at = (a?.createdAt || '');
+      const bt = (b?.createdAt || '');
+      if (at < bt) return 1;
+      if (at > bt) return -1;
+      return 0;
+    });
+
+    return out.filter(item => !!item.mediaId);
+  }
+
+  private normalizeCustomWatchlistMediaType(value: any): CustomWatchlistMediaType {
+    if (value === 'movie') return 'movie';
+    if (value === 'tv') return 'tv';
+    return 'both';
+  }
+
+  private normalizeCustomWatchlistItemMediaType(value: any): CustomWatchlistItemMediaType {
+    if (value === 'tv') return 'tv';
+    return 'movie';
   }
 
   public subscribeUserKeyedList(path: string, idFieldName: string, onItems: (items: any[]) => void): Unsubscribe {

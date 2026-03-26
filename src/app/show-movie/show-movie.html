@@ -246,7 +246,11 @@
         <h2 class="section-title">Directors</h2>
 
         <div class="people-grid" *ngIf="getDirectors().length > 0">
-          <div class="person-card" *ngFor="let person of getDirectors()">
+          <a
+            class="person-card"
+            *ngFor="let person of getDirectors()"
+            [routerLink]="['/show-celeb', person.id]"
+          >
             <img
               class="person-image"
               *ngIf="getCastProfile(person.profile_path)"
@@ -256,7 +260,7 @@
 
             <div class="person-name">{{ person.name }}</div>
             <div class="person-role">{{ person.job }}</div>
-          </div>
+          </a>
         </div>
 
         <div class="empty-box section-empty" *ngIf="getDirectors().length === 0"></div>
@@ -266,7 +270,11 @@
         <h2 class="section-title">Producers</h2>
 
         <div class="people-grid" *ngIf="getProducers().length > 0">
-          <div class="person-card" *ngFor="let person of getProducers()">
+          <a
+            class="person-card"
+            *ngFor="let person of getProducers()"
+            [routerLink]="['/show-celeb', person.id]"
+          >
             <img
               class="person-image"
               *ngIf="getCastProfile(person.profile_path)"
@@ -276,7 +284,7 @@
 
             <div class="person-name">{{ person.name }}</div>
             <div class="person-role">{{ person.job }}</div>
-          </div>
+          </a>
         </div>
 
         <div class="empty-box section-empty" *ngIf="getProducers().length === 0"></div>
@@ -286,7 +294,11 @@
         <h2 class="section-title">Writers</h2>
 
         <div class="people-grid" *ngIf="getWriters().length > 0">
-          <div class="person-card" *ngFor="let person of getWriters()">
+          <a
+            class="person-card"
+            *ngFor="let person of getWriters()"
+            [routerLink]="['/show-celeb', person.id]"
+          >
             <img
               class="person-image"
               *ngIf="getCastProfile(person.profile_path)"
@@ -296,7 +308,7 @@
 
             <div class="person-name">{{ person.name }}</div>
             <div class="person-role">{{ person.job }}</div>
-          </div>
+          </a>
         </div>
 
         <div class="empty-box section-empty" *ngIf="getWriters().length === 0"></div>
@@ -306,7 +318,11 @@
         <h2 class="section-title">Full cast</h2>
 
         <div class="cast-grid" *ngIf="getAllCast().length > 0">
-          <div class="cast-card" *ngFor="let actor of getAllCast()">
+          <a
+            class="cast-card"
+            *ngFor="let actor of getAllCast()"
+            [routerLink]="['/show-celeb', actor.id]"
+          >
             <img
               class="cast-image"
               *ngIf="getCastProfile(actor.profile_path)"
@@ -316,7 +332,7 @@
 
             <div class="cast-name">{{ actor.name }}</div>
             <div class="cast-character" *ngIf="actor.character">{{ actor.character }}</div>
-          </div>
+          </a>
         </div>
 
         <div class="empty-box section-empty" *ngIf="getAllCast().length === 0"></div>

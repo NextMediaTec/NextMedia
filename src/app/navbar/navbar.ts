@@ -66,7 +66,7 @@ export class Navbar implements OnInit, OnDestroy {
         items: [
           { label: 'Browse By Genre Movies', route: '/browse-by-genre-movies' },
           { label: 'Most Popular Movies', route: '/most-popular-movies' },
-          { label: 'Release Calendar Movies', route: '/release-calender-movies' },
+          { label: 'Release Calendar Movies', route: '/show-release-calender-months' },
           { label: 'Top 250 Movies', route: '/top250-movies' },
           { label: 'Top Box Office', route: '/top-box-office' }
         ]
@@ -76,7 +76,7 @@ export class Navbar implements OnInit, OnDestroy {
         items: [
           { label: 'Browse By Genre Series', route: '/browse-by-genre-series' },
           { label: 'Most Popular Series', route: '/most-popular-series' },
-          { label: 'Release Calendar Series', route: '/release-calender-series' },
+          { label: 'Release Calendar Series', route: '/show-release-calender-months-series' },
           { label: 'Top 250 Series', route: '/top250-series' }
         ]
       },

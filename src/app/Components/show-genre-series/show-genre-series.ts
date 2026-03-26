@@ -5,7 +5,7 @@ import { Subscription, forkJoin } from 'rxjs';
 import {
   BackendTmdbResponse,
   TmdbGenre,
-  TmdbMovieGenresResponse,
+  TmdbTvGenresResponse,
   TmdbSearchMultiResponse,
   TmdbSearchMultiResult,
   TmdbService
@@ -13,27 +13,27 @@ import {
 import { MediaRatingSummary, ReviewsService } from '../../services/reviews.service';
 import { WatchlistButtonComponent } from '../../Watchlist/watchlist-button/watchlist-button';
 
-interface RatedGenreMovie extends TmdbSearchMultiResult {
+interface RatedGenreSeries extends TmdbSearchMultiResult {
   ownAverageRating: number;
   ownRatingCount: number;
 }
 
 @Component({
-  selector: 'app-show-genre-movies',
+  selector: 'app-show-genre-series',
   standalone: true,
   imports: [CommonModule, RouterLink, WatchlistButtonComponent],
-  templateUrl: './show-genre-movies.html',
-  styleUrl: './show-genre-movies.scss',
+  templateUrl: './show-genre-series.html',
+  styleUrl: './show-genre-series.scss',
 })
-export class ShowGenreMovies implements OnInit, OnDestroy {
+export class ShowGenreSeries implements OnInit, OnDestroy {
   public genreId: number = 0;
   public genreName: string = '';
-  public heroMovie: TmdbSearchMultiResult | null = null;
+  public heroSeries: TmdbSearchMultiResult | null = null;
 
-  public popularMovies: TmdbSearchMultiResult[] = [];
-  public latestMovies: TmdbSearchMultiResult[] = [];
-  public upcomingMovies: TmdbSearchMultiResult[] = [];
-  public customTopRatedMovies: RatedGenreMovie[] = [];
+  public popularSeries: TmdbSearchMultiResult[] = [];
+  public latestSeries: TmdbSearchMultiResult[] = [];
+  public upcomingSeries: TmdbSearchMultiResult[] = [];
+  public customTopRatedSeries: RatedGenreSeries[] = [];
 
   public isLoading: boolean = false;
   public hasError: boolean = false;
@@ -72,27 +72,27 @@ export class ShowGenreMovies implements OnInit, OnDestroy {
   }
 
   public getHeroImage(): string {
-    if (!this.heroMovie) {
+    if (!this.heroSeries) {
       return '';
     }
 
-    if (this.heroMovie.backdrop_path) {
-      return this.tmdbService.getBackdropUrl(this.heroMovie.backdrop_path, 'w1280');
+    if (this.heroSeries.backdrop_path) {
+      return this.tmdbService.getBackdropUrl(this.heroSeries.backdrop_path, 'w1280');
     }
 
-    return this.tmdbService.getPosterUrl(this.heroMovie.poster_path, 'w500');
+    return this.tmdbService.getPosterUrl(this.heroSeries.poster_path, 'w500');
   }
 
   public getPosterUrl(path: string | null): string {
     return this.tmdbService.getPosterUrl(path, 'w500');
   }
 
-  public getDisplayTitle(movie: TmdbSearchMultiResult): string {
-    return this.tmdbService.getDisplayTitle(movie);
+  public getDisplayTitle(series: TmdbSearchMultiResult): string {
+    return this.tmdbService.getDisplayTitle(series);
   }
 
-  public getDisplayYear(movie: TmdbSearchMultiResult): string {
-    const rawDate = this.tmdbService.getDisplayDate(movie);
+  public getDisplayYear(series: TmdbSearchMultiResult): string {
+    const rawDate = this.tmdbService.getDisplayDate(series);
 
     if (!rawDate || rawDate.trim().length < 4) {
       return '';
@@ -101,8 +101,8 @@ export class ShowGenreMovies implements OnInit, OnDestroy {
     return rawDate.slice(0, 4);
   }
 
-  public getDisplayReleaseDate(movie: TmdbSearchMultiResult): string {
-    const rawDate = this.tmdbService.getDisplayDate(movie);
+  public getDisplayReleaseDate(series: TmdbSearchMultiResult): string {
+    const rawDate = this.tmdbService.getDisplayDate(series);
 
     if (!rawDate || rawDate.trim().length === 0) {
       return 'Ukendt dato';
@@ -121,8 +121,8 @@ export class ShowGenreMovies implements OnInit, OnDestroy {
     });
   }
 
-  public getOverview(movie: TmdbSearchMultiResult): string {
-    const overview = String(movie.overview || '').trim();
+  public getOverview(series: TmdbSearchMultiResult): string {
+    const overview = String(series.overview || '').trim();
 
     if (overview.length === 0) {
       return 'Ingen beskrivelse endnu.';
@@ -131,8 +131,8 @@ export class ShowGenreMovies implements OnInit, OnDestroy {
     return overview;
   }
 
-  public getOwnAverageRating(movieId: number): string {
-    const summary = this.ratingsMap[movieId];
+  public getOwnAverageRating(seriesId: number): string {
+    const summary = this.ratingsMap[seriesId];
 
     if (!summary || summary.reviewCount <= 0) {
       return 'Ingen ratings endnu';
@@ -141,8 +141,8 @@ export class ShowGenreMovies implements OnInit, OnDestroy {
     return `${summary.averageRating.toFixed(1)}/5`;
   }
 
-  public getOwnReviewCount(movieId: number): number {
-    const summary = this.ratingsMap[movieId];
+  public getOwnReviewCount(seriesId: number): number {
+    const summary = this.ratingsMap[seriesId];
 
     if (!summary) {
       return 0;
@@ -151,8 +151,8 @@ export class ShowGenreMovies implements OnInit, OnDestroy {
     return summary.reviewCount;
   }
 
-  public hasOwnRating(movieId: number): boolean {
-    const summary = this.ratingsMap[movieId];
+  public hasOwnRating(seriesId: number): boolean {
+    const summary = this.ratingsMap[seriesId];
 
     if (!summary) {
       return false;
@@ -165,33 +165,33 @@ export class ShowGenreMovies implements OnInit, OnDestroy {
     return Number(value || 0).toFixed(1);
   }
 
-  public trackByMovieId(index: number, movie: TmdbSearchMultiResult): number {
-    return movie.id;
+  public trackBySeriesId(index: number, series: TmdbSearchMultiResult): number {
+    return series.id;
   }
 
-  public getFeaturedStandardMovies(movies: TmdbSearchMultiResult[]): TmdbSearchMultiResult[] {
-    return movies.slice(0, 3);
+  public getFeaturedStandardSeries(series: TmdbSearchMultiResult[]): TmdbSearchMultiResult[] {
+    return series.slice(0, 3);
   }
 
-  public getRemainingStandardMovies(movies: TmdbSearchMultiResult[]): TmdbSearchMultiResult[] {
-    return movies.slice(3);
+  public getRemainingStandardSeries(series: TmdbSearchMultiResult[]): TmdbSearchMultiResult[] {
+    return series.slice(3);
   }
 
-  public getFeaturedRatedMovies(movies: RatedGenreMovie[]): RatedGenreMovie[] {
-    return movies.slice(0, 3);
+  public getFeaturedRatedSeries(series: RatedGenreSeries[]): RatedGenreSeries[] {
+    return series.slice(0, 3);
   }
 
-  public getRemainingRatedMovies(movies: RatedGenreMovie[]): RatedGenreMovie[] {
-    return movies.slice(3);
+  public getRemainingRatedSeries(series: RatedGenreSeries[]): RatedGenreSeries[] {
+    return series.slice(3);
   }
 
   private loadGenrePage(): void {
     this.genreName = '';
-    this.heroMovie = null;
-    this.popularMovies = [];
-    this.latestMovies = [];
-    this.upcomingMovies = [];
-    this.customTopRatedMovies = [];
+    this.heroSeries = null;
+    this.popularSeries = [];
+    this.latestSeries = [];
+    this.upcomingSeries = [];
+    this.customTopRatedSeries = [];
     this.ratingsMap = {};
     this.isLoading = true;
     this.hasError = false;
@@ -202,98 +202,98 @@ export class ShowGenreMovies implements OnInit, OnDestroy {
     const threeMonthsFromToday = this.getDateStringMonthsFromNow(3);
 
     const popularRequests = [
-      this.tmdbService.discoverMoviesAdvanced({
+      this.tmdbService.discoverTvAdvanced({
         page: 1,
         withGenres: String(this.genreId),
         language: 'en-US',
         sortBy: 'popularity.desc',
-        releaseDateLte: today
+        firstAirDateLte: today
       }),
-      this.tmdbService.discoverMoviesAdvanced({
+      this.tmdbService.discoverTvAdvanced({
         page: 2,
         withGenres: String(this.genreId),
         language: 'en-US',
         sortBy: 'popularity.desc',
-        releaseDateLte: today
+        firstAirDateLte: today
       })
     ];
 
     const latestRequests = [
-      this.tmdbService.discoverMoviesAdvanced({
+      this.tmdbService.discoverTvAdvanced({
         page: 1,
         withGenres: String(this.genreId),
         language: 'en-US',
-        sortBy: 'primary_release_date.desc',
-        releaseDateLte: today
+        sortBy: 'first_air_date.desc',
+        firstAirDateLte: today
       }),
-      this.tmdbService.discoverMoviesAdvanced({
+      this.tmdbService.discoverTvAdvanced({
         page: 2,
         withGenres: String(this.genreId),
         language: 'en-US',
-        sortBy: 'primary_release_date.desc',
-        releaseDateLte: today
+        sortBy: 'first_air_date.desc',
+        firstAirDateLte: today
       })
     ];
 
     const upcomingRequests = [
-      this.tmdbService.discoverMoviesAdvanced({
+      this.tmdbService.discoverTvAdvanced({
         page: 1,
         withGenres: String(this.genreId),
         language: 'en-US',
-        sortBy: 'primary_release_date.asc',
-        releaseDateGte: today,
-        releaseDateLte: threeMonthsFromToday
+        sortBy: 'first_air_date.asc',
+        firstAirDateGte: today,
+        firstAirDateLte: threeMonthsFromToday
       }),
-      this.tmdbService.discoverMoviesAdvanced({
+      this.tmdbService.discoverTvAdvanced({
         page: 2,
         withGenres: String(this.genreId),
         language: 'en-US',
-        sortBy: 'primary_release_date.asc',
-        releaseDateGte: today,
-        releaseDateLte: threeMonthsFromToday
+        sortBy: 'first_air_date.asc',
+        firstAirDateGte: today,
+        firstAirDateLte: threeMonthsFromToday
       })
     ];
 
     const ratingCandidateRequests = [
-      this.tmdbService.discoverMoviesAdvanced({
+      this.tmdbService.discoverTvAdvanced({
         page: 1,
         withGenres: String(this.genreId),
         language: 'en-US',
         sortBy: 'popularity.desc',
-        releaseDateLte: today
+        firstAirDateLte: today
       }),
-      this.tmdbService.discoverMoviesAdvanced({
+      this.tmdbService.discoverTvAdvanced({
         page: 2,
         withGenres: String(this.genreId),
         language: 'en-US',
         sortBy: 'popularity.desc',
-        releaseDateLte: today
+        firstAirDateLte: today
       }),
-      this.tmdbService.discoverMoviesAdvanced({
+      this.tmdbService.discoverTvAdvanced({
         page: 3,
         withGenres: String(this.genreId),
         language: 'en-US',
         sortBy: 'popularity.desc',
-        releaseDateLte: today
+        firstAirDateLte: today
       }),
-      this.tmdbService.discoverMoviesAdvanced({
+      this.tmdbService.discoverTvAdvanced({
         page: 4,
         withGenres: String(this.genreId),
         language: 'en-US',
         sortBy: 'popularity.desc',
-        releaseDateLte: today
+        firstAirDateLte: today
       }),
-      this.tmdbService.discoverMoviesAdvanced({
+      this.tmdbService.discoverTvAdvanced({
         page: 5,
         withGenres: String(this.genreId),
         language: 'en-US',
         sortBy: 'popularity.desc',
-        releaseDateLte: today
+        firstAirDateLte: today
       })
     ];
 
     forkJoin({
-      genreResponse: this.tmdbService.getMovieGenres(),
+      genreResponse: this.tmdbService.getTvGenres(),
       popularResponses: forkJoin(popularRequests),
       latestResponses: forkJoin(latestRequests),
       upcomingResponses: forkJoin(upcomingRequests),
@@ -306,7 +306,7 @@ export class ShowGenreMovies implements OnInit, OnDestroy {
         upcomingResponses,
         ratingCandidateResponses
       }: {
-        genreResponse: BackendTmdbResponse<TmdbMovieGenresResponse>;
+        genreResponse: BackendTmdbResponse<TmdbTvGenresResponse>;
         popularResponses: BackendTmdbResponse<TmdbSearchMultiResponse>[];
         latestResponses: BackendTmdbResponse<TmdbSearchMultiResponse>[];
         upcomingResponses: BackendTmdbResponse<TmdbSearchMultiResponse>[];
@@ -324,50 +324,48 @@ export class ShowGenreMovies implements OnInit, OnDestroy {
 
           this.genreName = foundGenre ? foundGenre.name : 'Genre';
 
-          const popularMovies = this.flattenMovieResponses(popularResponses).slice(0, 25);
-          const latestMovies = this.flattenMovieResponses(latestResponses)
-            .filter((movie: TmdbSearchMultiResult) => this.isReleasedInOrBeforeYear(movie, 2027))
+          const popularSeries = this.flattenSeriesResponses(popularResponses).slice(0, 25);
+          const latestSeries = this.flattenSeriesResponses(latestResponses).slice(0, 25);
+          const upcomingSeries = this.flattenSeriesResponses(upcomingResponses)
+            .filter((series: TmdbSearchMultiResult) => this.isUpcomingWithinNextThreeMonths(series))
             .slice(0, 25);
-          const upcomingMovies = this.flattenMovieResponses(upcomingResponses)
-            .filter((movie: TmdbSearchMultiResult) => this.isUpcomingWithinNextThreeMonths(movie))
-            .slice(0, 25);
-          const ratingCandidates = this.flattenMovieResponses(ratingCandidateResponses);
+          const ratingCandidates = this.flattenSeriesResponses(ratingCandidateResponses);
 
-          this.popularMovies = popularMovies;
-          this.latestMovies = latestMovies;
-          this.upcomingMovies = upcomingMovies;
-          this.heroMovie = popularMovies.length > 0
-            ? popularMovies[0]
-            : (latestMovies.length > 0 ? latestMovies[0] : (upcomingMovies.length > 0 ? upcomingMovies[0] : null));
+          this.popularSeries = popularSeries;
+          this.latestSeries = latestSeries;
+          this.upcomingSeries = upcomingSeries;
+          this.heroSeries = popularSeries.length > 0
+            ? popularSeries[0]
+            : (latestSeries.length > 0 ? latestSeries[0] : (upcomingSeries.length > 0 ? upcomingSeries[0] : null));
 
-          const allMovieIds = Array.from(
+          const allSeriesIds = Array.from(
             new Set(
               [
-                ...popularMovies.map((movie: TmdbSearchMultiResult) => movie.id),
-                ...latestMovies.map((movie: TmdbSearchMultiResult) => movie.id),
-                ...upcomingMovies.map((movie: TmdbSearchMultiResult) => movie.id),
-                ...ratingCandidates.map((movie: TmdbSearchMultiResult) => movie.id)
+                ...popularSeries.map((series: TmdbSearchMultiResult) => series.id),
+                ...latestSeries.map((series: TmdbSearchMultiResult) => series.id),
+                ...upcomingSeries.map((series: TmdbSearchMultiResult) => series.id),
+                ...ratingCandidates.map((series: TmdbSearchMultiResult) => series.id)
               ]
             )
           );
 
           this.ratingsMap = await this.reviewsService.getAverageRatingsForMediaIds(
-            'movie',
-            allMovieIds
+            'tv',
+            allSeriesIds
           );
 
-          const ratedCandidates: RatedGenreMovie[] = ratingCandidates
-            .map((movie: TmdbSearchMultiResult) => {
-              const ratingSummary: MediaRatingSummary | undefined = this.ratingsMap[movie.id];
+          const ratedCandidates: RatedGenreSeries[] = ratingCandidates
+            .map((series: TmdbSearchMultiResult) => {
+              const ratingSummary: MediaRatingSummary | undefined = this.ratingsMap[series.id];
 
               return {
-                ...movie,
+                ...series,
                 ownAverageRating: ratingSummary ? ratingSummary.averageRating : 0,
                 ownRatingCount: ratingSummary ? ratingSummary.reviewCount : 0
               };
             })
-            .filter((movie: RatedGenreMovie) => movie.ownRatingCount > 0)
-            .sort((a: RatedGenreMovie, b: RatedGenreMovie) => {
+            .filter((series: RatedGenreSeries) => series.ownRatingCount > 0)
+            .sort((a: RatedGenreSeries, b: RatedGenreSeries) => {
               if (b.ownAverageRating !== a.ownAverageRating) {
                 return b.ownAverageRating - a.ownAverageRating;
               }
@@ -380,22 +378,22 @@ export class ShowGenreMovies implements OnInit, OnDestroy {
             })
             .slice(0, 25);
 
-          this.customTopRatedMovies = ratedCandidates;
+          this.customTopRatedSeries = ratedCandidates;
           this.isLoading = false;
           this.changeDetectorRef.detectChanges();
         } catch (error) {
-          this.customTopRatedMovies = [];
+          this.customTopRatedSeries = [];
           this.isLoading = false;
           this.changeDetectorRef.detectChanges();
         }
       },
       error: () => {
-        this.finishWithError('Der opstod en fejl under hentning af genre-film.');
+        this.finishWithError('Der opstod en fejl under hentning af genre-serier.');
       }
     });
   }
 
-  private flattenMovieResponses(
+  private flattenSeriesResponses(
     responses: BackendTmdbResponse<TmdbSearchMultiResponse>[]
   ): TmdbSearchMultiResult[] {
     const merged: TmdbSearchMultiResult[] = [];
@@ -406,7 +404,7 @@ export class ShowGenreMovies implements OnInit, OnDestroy {
       }
 
       for (const item of response.data.results) {
-        if (item.media_type !== 'movie') {
+        if (item.media_type !== 'tv') {
           continue;
         }
 
@@ -416,39 +414,17 @@ export class ShowGenreMovies implements OnInit, OnDestroy {
 
     const uniqueMap = new Map<number, TmdbSearchMultiResult>();
 
-    for (const movie of merged) {
-      if (!uniqueMap.has(movie.id)) {
-        uniqueMap.set(movie.id, movie);
+    for (const series of merged) {
+      if (!uniqueMap.has(series.id)) {
+        uniqueMap.set(series.id, series);
       }
     }
 
     return Array.from(uniqueMap.values());
   }
 
-  private isReleasedInOrBeforeYear(movie: TmdbSearchMultiResult, maxYear: number): boolean {
-    const rawDate = this.tmdbService.getDisplayDate(movie);
-
-    if (!rawDate || rawDate.trim().length < 4) {
-      return false;
-    }
-
-    const parsedDate = new Date(rawDate);
-
-    if (!Number.isNaN(parsedDate.getTime())) {
-      return parsedDate.getFullYear() <= maxYear;
-    }
-
-    const parsedYear = Number(rawDate.slice(0, 4));
-
-    if (Number.isNaN(parsedYear)) {
-      return false;
-    }
-
-    return parsedYear <= maxYear;
-  }
-
-  private isUpcomingWithinNextThreeMonths(movie: TmdbSearchMultiResult): boolean {
-    const parsedDate = this.parseMovieDate(movie);
+  private isUpcomingWithinNextThreeMonths(series: TmdbSearchMultiResult): boolean {
+    const parsedDate = this.parseSeriesDate(series);
 
     if (!parsedDate) {
       return false;
@@ -461,8 +437,8 @@ export class ShowGenreMovies implements OnInit, OnDestroy {
     return parsedDate >= todayStart && parsedDate <= threeMonthsAhead;
   }
 
-  private parseMovieDate(movie: TmdbSearchMultiResult): Date | null {
-    const rawDate = this.tmdbService.getDisplayDate(movie);
+  private parseSeriesDate(series: TmdbSearchMultiResult): Date | null {
+    const rawDate = this.tmdbService.getDisplayDate(series);
 
     if (!rawDate || rawDate.trim().length === 0) {
       return null;

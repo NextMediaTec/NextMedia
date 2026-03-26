@@ -1,0 +1,281 @@
+<div class="panel-title-row">
+  <h2 class="panel-title">Watchlist</h2>
+  <span class="panel-chip">Movies and series</span>
+</div>
+
+<div class="watchlist-sections">
+  <div class="watchlist-section" *ngIf="isOwner">
+    <button
+      type="button"
+      class="watchlist-toggle outline-box"
+      (click)="toggleCustomListsExpanded()"
+      [attr.aria-expanded]="isCustomListsExpanded"
+    >
+      <div class="watchlist-toggle-left">
+        <span
+          class="watchlist-toggle-arrow"
+          [class.watchlist-toggle-arrow-open]="isCustomListsExpanded"
+        >
+          ▼
+        </span>
+        <span class="watchlist-toggle-title">Custom Watchlists</span>
+      </div>
+
+      <span class="watchlist-toggle-count">{{ customWatchlists.length }}</span>
+    </button>
+
+    <div class="watchlist-list-wrap" *ngIf="isCustomListsExpanded">
+      <div class="custom-watchlists-toolbar">
+        <button
+          type="button"
+          class="custom-watchlists-create-toggle"
+          (click)="toggleCreateListForm()"
+        >
+          {{ isCreateListFormVisible ? 'Close Create List' : 'Create New List' }}
+        </button>
+      </div>
+
+      <div class="custom-watchlist-create-box outline-box" *ngIf="isCreateListFormVisible">
+        <div class="custom-watchlist-create-title">Create New Watchlist</div>
+
+        <div class="custom-watchlist-form-grid">
+          <div class="custom-watchlist-field">
+            <label class="custom-watchlist-label">List Name</label>
+            <input
+              type="text"
+              class="custom-watchlist-input"
+              [value]="createListName"
+              (input)="updateCreateListName($event)"
+              placeholder="Enter list name"
+            />
+          </div>
+
+          <div class="custom-watchlist-field">
+            <label class="custom-watchlist-label">Media Type</label>
+            <select
+              class="custom-watchlist-select"
+              [value]="createListMediaType"
+              (change)="updateCreateListMediaType($event)"
+            >
+              <option value="movie">Movies</option>
+              <option value="tv">Series</option>
+              <option value="both">Both</option>
+            </select>
+          </div>
+
+          <div class="custom-watchlist-field">
+            <label class="custom-watchlist-label">Visual Genre</label>
+            <select
+              class="custom-watchlist-select"
+              [value]="createListGenreValue"
+              (change)="updateCreateListGenreValue($event)"
+            >
+              <option value="">No genre</option>
+              <option
+                *ngFor="let genre of getAvailableGenreOptions()"
+                [value]="getGenreOptionValue(genre)"
+              >
+                {{ genre.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="custom-watchlist-form-actions">
+          <button
+            type="button"
+            class="custom-watchlist-create-button"
+            (click)="createCustomWatchlist()"
+            [disabled]="isCreatingCustomWatchlist"
+          >
+            Create List
+          </button>
+        </div>
+      </div>
+
+      <div class="custom-watchlists-list outline-box">
+        <div class="custom-watchlist-row" *ngFor="let list of customWatchlists">
+          <div class="custom-watchlist-main">
+            <div class="custom-watchlist-name">{{ list.name }}</div>
+            <div class="custom-watchlist-sub">Type: {{ getCustomWatchlistMediaTypeLabel(list.mediaType) }}</div>
+            <div class="custom-watchlist-sub">Genre: {{ list.genreName || 'None' }}</div>
+            <div class="custom-watchlist-sub">Created: {{ list.createdAt || '—' }}</div>
+          </div>
+
+          <div class="custom-watchlist-actions">
+            <button
+              type="button"
+              class="custom-watchlist-delete-button"
+              (click)="deleteCustomWatchlist(list.listId)"
+              [disabled]="isDeletingCustomWatchlist"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <div class="empty" *ngIf="customWatchlists.length === 0">
+          No custom watchlists yet.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="watchlist-section">
+    <button
+      type="button"
+      class="watchlist-toggle outline-box"
+      (click)="toggleMoviesExpanded()"
+      [attr.aria-expanded]="isMoviesExpanded"
+    >
+      <div class="watchlist-toggle-left">
+        <span
+          class="watchlist-toggle-arrow"
+          [class.watchlist-toggle-arrow-open]="isMoviesExpanded"
+        >
+          ▼
+        </span>
+        <span class="watchlist-toggle-title">Watchlist Movies</span>
+      </div>
+
+      <span class="watchlist-toggle-count">{{ watchlistMovieDetails.length }}</span>
+    </button>
+
+    <div class="watchlist-list-wrap" *ngIf="isMoviesExpanded">
+      <div class="watchlist-bulk-actions" *ngIf="watchlistMovieDetails.length > 0">
+        <button
+          type="button"
+          class="watchlist-delete-selected-button"
+          (click)="removeSelectedMovies()"
+          [disabled]="selectedMovieIds.length === 0 || isRemovingSelectedMovies"
+        >
+          Remove Selected Movies
+        </button>
+      </div>
+
+      <div class="watchlist-list outline-box">
+        <div class="watchlist-list-row" *ngFor="let m of watchlistMovieDetails">
+          <div class="watchlist-list-selection">
+            <input
+              type="checkbox"
+              class="watchlist-checkbox"
+              [checked]="isMovieSelected(m.movieId)"
+              (change)="onMovieSelectionChange(m.movieId, $event)"
+            />
+          </div>
+
+          <div class="watchlist-list-poster-wrap">
+            <img
+              [src]="getWatchlistPosterOrFallback(m.posterUrl)"
+              [alt]="m.title || 'Movie poster'"
+              class="watchlist-list-poster"
+            />
+          </div>
+
+          <div class="watchlist-list-main">
+            <div class="watchlist-list-title">{{ m?.title || m?.movieId || 'Unknown' }}</div>
+            <div class="watchlist-list-sub">Genres: {{ m?.genresText || 'Unknown' }}</div>
+            <div class="watchlist-list-sub">Release Date: {{ m?.releaseDate || '—' }}</div>
+            <div class="watchlist-list-sub">Rating: {{ m?.ratingText || '—' }}</div>
+            <div class="watchlist-list-sub">ID: {{ m?.movieId || '—' }}</div>
+            <div class="watchlist-list-sub">Added: {{ m?.createdAt || '—' }}</div>
+          </div>
+
+          <div class="watchlist-list-actions">
+            <button
+              type="button"
+              class="watchlist-delete-button"
+              (click)="removeMovie(m.movieId)"
+              [disabled]="isRemovingSingleMovie"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+
+        <div class="empty" *ngIf="watchlistMovieDetails.length === 0">
+          No watchlist movies yet.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="watchlist-section">
+    <button
+      type="button"
+      class="watchlist-toggle outline-box"
+      (click)="toggleSeriesExpanded()"
+      [attr.aria-expanded]="isSeriesExpanded"
+    >
+      <div class="watchlist-toggle-left">
+        <span
+          class="watchlist-toggle-arrow"
+          [class.watchlist-toggle-arrow-open]="isSeriesExpanded"
+        >
+          ▼
+        </span>
+        <span class="watchlist-toggle-title">Watchlist Series</span>
+      </div>
+
+      <span class="watchlist-toggle-count">{{ watchlistSeriesDetails.length }}</span>
+    </button>
+
+    <div class="watchlist-list-wrap" *ngIf="isSeriesExpanded">
+      <div class="watchlist-bulk-actions" *ngIf="watchlistSeriesDetails.length > 0">
+        <button
+          type="button"
+          class="watchlist-delete-selected-button"
+          (click)="removeSelectedSeries()"
+          [disabled]="selectedSeriesIds.length === 0 || isRemovingSelectedSeries"
+        >
+          Remove Selected Series
+        </button>
+      </div>
+
+      <div class="watchlist-list outline-box">
+        <div class="watchlist-list-row" *ngFor="let s of watchlistSeriesDetails">
+          <div class="watchlist-list-selection">
+            <input
+              type="checkbox"
+              class="watchlist-checkbox"
+              [checked]="isSeriesSelected(s.seriesId)"
+              (change)="onSeriesSelectionChange(s.seriesId, $event)"
+            />
+          </div>
+
+          <div class="watchlist-list-poster-wrap">
+            <img
+              [src]="getWatchlistPosterOrFallback(s.posterUrl)"
+              [alt]="s.title || 'Series poster'"
+              class="watchlist-list-poster"
+            />
+          </div>
+
+          <div class="watchlist-list-main">
+            <div class="watchlist-list-title">{{ s?.title || s?.seriesId || 'Unknown' }}</div>
+            <div class="watchlist-list-sub">Genres: {{ s?.genresText || 'Unknown' }}</div>
+            <div class="watchlist-list-sub">First Air Date: {{ s?.releaseDate || '—' }}</div>
+            <div class="watchlist-list-sub">Rating: {{ s?.ratingText || '—' }}</div>
+            <div class="watchlist-list-sub">ID: {{ s?.seriesId || '—' }}</div>
+            <div class="watchlist-list-sub">Added: {{ s?.createdAt || '—' }}</div>
+          </div>
+
+          <div class="watchlist-list-actions">
+            <button
+              type="button"
+              class="watchlist-delete-button"
+              (click)="removeSeries(s.seriesId)"
+              [disabled]="isRemovingSingleSeries"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+
+        <div class="empty" *ngIf="watchlistSeriesDetails.length === 0">
+          No watchlist series yet.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
