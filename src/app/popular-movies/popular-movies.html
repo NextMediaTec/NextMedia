@@ -1,0 +1,77 @@
+<div class="popular-movies-page">
+    <div class="page-header">
+        <h1>Most Popular Movies</h1>
+        <p>Discover the most popular movies right now</p>
+    </div>
+
+    <div *ngIf="isLoading" class="state-message loading">
+        Loading popular movies
+    </div>
+
+    <div *ngIf="!isLoading && errorMessage" class="state-message error">
+        {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage" class="movies-list">
+        <div
+        class="movie-row"
+        *ngFor="let movie of movies; let i = index; trackBy: trackByMovieId"
+        >
+        <div class="rank">
+            {{ ((currentPage - 1) * 20) + i + 1}}
+        </div>
+
+        <div class="poster">
+            <img
+            [src]="getPoster(movie)"
+            [alt]="getTitle(movie)"
+            />
+        </div>
+
+        <div class="movie-info">
+            <a
+                class="movie-title"
+                [routerLink]="['/details', 'movie', movie.id]"
+                >
+                {{ getTitle(movie) }}
+            </a>
+
+            <div class="movie-meta">
+                <span>{{ getReleaseYear(movie) }}</span>
+                <span class="dot">•</span>
+                <span>Movie</span>
+            </div>
+
+            <p class="overview">
+                {{ movie.overview || 'No description available.'}}
+            </p>
+        </div>
+
+        <div class="rating">
+            <span class="star">★</span>
+            <span>{{ getRating(movie) }}</span>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="!isLoading && !errorMessage && movies.length > 0" class="pagination">
+    <button
+        type="button"
+        (click)="goToPreviousPage()"
+        [disabled]="currentPage === 1"
+    >
+    Previous
+    </button>
+
+    <span>Page {{ currentPage }} of {{ totalPages}} </span>
+
+    <button
+        type="button"
+        (click)="goToNextPage()"
+        [disabled]="currentPage === totalPages"
+    >
+    Next
+    </button>
+
+</div>
+</div>

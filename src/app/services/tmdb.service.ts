@@ -612,6 +612,41 @@ export class TmdbService {
     );
   }
 
+   public discoverSeriesAdvanced(
+    options: TmdbDiscoverMovieOptions
+  ): Observable<BackendTmdbResponse<TmdbSearchMultiResponse>> {
+    let params = new HttpParams();
+
+    params = params.set('page', String(options.page ?? 1));
+    params = params.set('language', options.language ?? 'en-US');
+    params = params.set('sort_by', options.sortBy ?? 'popularity.desc');
+
+    if (String(options.withGenres || '').trim().length > 0) {
+      params = params.set('with_genres', String(options.withGenres).trim());
+    }
+
+    if (String(options.releaseDateLte || '').trim().length > 0) {
+      params = params.set('release_date.lte', String(options.releaseDateLte).trim());
+    }
+
+    if (String(options.releaseDateGte || '').trim().length > 0) {
+      params = params.set('release_date.gte', String(options.releaseDateGte).trim());
+    }
+
+    if (typeof options.voteCountGte === 'number' && !Number.isNaN(options.voteCountGte)) {
+      params = params.set('vote_count.gte', String(options.voteCountGte));
+    }
+
+    if (String(options.region || '').trim().length > 0) {
+      params = params.set('region', String(options.region).trim());
+    }
+
+    return this.http.get<BackendTmdbResponse<TmdbSearchMultiResponse>>(
+      `${this.backendBaseUrl}/discover/tv`,
+      { params }
+    );
+  }
+
   public discoverTvAdvanced(
     options: TmdbDiscoverMovieOptions
   ): Observable<BackendTmdbResponse<TmdbSearchMultiResponse>> {

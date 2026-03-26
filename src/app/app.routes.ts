@@ -9,13 +9,14 @@ import { ShowMovieComponent } from './show-movie/show-movie';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { AdminGuard } from './guards/admin.guard';
 import { Adminpage } from './adminpage/adminpage';
+import { PopularMovies } from './popular-movies/popular-movies';
 
 import { BrowseByGenreMovies } from './Components/browse-by-genre-movies/browse-by-genre-movies';
 import { BrowseByGenreSeries } from './Components//browse-by-genre-series/browse-by-genre-series';
 import { CelebsBornToday } from './Components//celebs-born-today/celebs-born-today';
 import { MostPopularCeleb } from './Components//most-popular-celeb/most-popular-celeb';
-import { MostPopularMovies } from './Components//most-popular-movies/most-popular-movies';
-import { MostPopularSeries } from './Components//most-popular-series/most-popular-series';
+import { PopularSeries } from './popular-series/popular-series';
+
 import { ReleaseCalenderMovies } from './Components//release-calender-movies/release-calender-movies';
 import { ReleaseCalenderSeries } from './Components//release-calender-series/release-calender-series';
 import { TopBoxOffice } from './Components//top-box-office/top-box-office';
@@ -28,6 +29,19 @@ import { ShowReleaseCalenderMonths } from './Components/show-release-calender-mo
 import { ShowReleaseCalenderMonthsSeries } from './Components/show-release-calender-months-series/show-release-calender-months-series';
 
 export const routes: Route[] = [
+
+    { path: 'show-movie/:mediaType/:id', component: ShowMovieComponent },
+    {path: '', redirectTo: '/login', pathMatch: 'full'},
+    {path: 'register', component: RegisterComponent},
+    {path: 'login', component: LoginComponent},
+    {path: 'home', component: HomeComponent, canActivate: [AuthGuard]},
+    {path: 'dashboard', component: DashboardComponent},
+    {path: 'profile', component: UserProfile, canActivate: [AuthGuard]},
+    {path: 'profile/:uid', component: UserProfile, canActivate: [AuthGuard]},
+    {path: 'forgot-password', component: ForgotPasswordComponent},
+    {path: 'admin', component: Adminpage, canActivate: [AdminGuard]},
+    {path: 'most-popular-movies', component: PopularMovies, canActivate: [AuthGuard]},
+    { path: 'most-popular-series', component: PopularSeries },
   { path: 'show-movie/:mediaType/:id', component: ShowMovieComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'register', component: RegisterComponent },
