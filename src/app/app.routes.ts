@@ -16,6 +16,8 @@ import { BrowseByGenreSeries } from './Components//browse-by-genre-series/browse
 import { CelebsBornToday } from './Components//celebs-born-today/celebs-born-today';
 import { MostPopularCeleb } from './Components//most-popular-celeb/most-popular-celeb';
 import { PopularSeries } from './popular-series/popular-series';
+import { MostPopularMovies } from './Components//most-popular-movies/most-popular-movies';
+import { MostPopularSeries } from './Components//most-popular-series/most-popular-series';
 
 import { ReleaseCalenderMovies } from './Components//release-calender-movies/release-calender-movies';
 import { ReleaseCalenderSeries } from './Components//release-calender-series/release-calender-series';
